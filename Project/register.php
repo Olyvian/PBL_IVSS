@@ -2,11 +2,6 @@
 include 'koneksi.php';
 $message = '';
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: galeri.php");
-    exit;
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email']; 
