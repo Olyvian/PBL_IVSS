@@ -8,7 +8,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Ambil semua data dari form, termasuk email
     $username = $_POST['username'];
     $email = $_POST['email']; 
     $password = $_POST['password'];
