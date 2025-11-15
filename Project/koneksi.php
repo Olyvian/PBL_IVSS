@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 $host = "localhost";
 $port = "5432";
 $user = "postgres";
-$password = "faatihurrizki123";
+$password = " "; //isi sesuai password Database
 $dbname = "pbl";
 
 // String koneksi ke database pbl
