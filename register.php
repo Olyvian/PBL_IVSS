@@ -1,5 +1,5 @@
 <?php
-include 'koneksi.php';
+include 'koneksi.php'; 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,24 +11,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $confirm_password) {
         $message = "❌ Konfirmasi password tidak cocok!";
     } else {
-        $query = pg_query_params($koneksi, "SELECT id FROM users WHERE username=$1 OR email=$2", array($username, $email));
         
-        if (pg_num_rows($query) > 0) {
+        $check_stmt = $koneksi->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
+        $check_stmt->execute(['username' => $username, 'email' => $email]);
+        
+        if ($check_stmt->rowCount() > 0) {
             $message = "❌ Username atau email sudah digunakan!";
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            $insert_query = pg_query_params(
-                $koneksi, 
-                "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)", 
-                array($username, $email, $hashed_password)
+            $insert_stmt = $koneksi->prepare(
+                "INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, 'user')"
             );
             
-            if ($insert_query) {
+            try {
+                $insert_stmt->execute([
+                    'username' => $username, 
+                    'email' => $email, 
+                    'password' => $hashed_password
+                ]);
+                
                 $message = "✅ Registrasi berhasil! Silakan <a href='login.php'>login</a>.";
-            } else {
-                $error_detail = pg_last_error($koneksi);
-                $message = "❌ Registrasi gagal. Error: " . htmlspecialchars($error_detail);
+            } catch (PDOException $e) {
+                $message = "❌ Registrasi gagal. Error: " . htmlspecialchars($e->getMessage());
             }
         }
     }

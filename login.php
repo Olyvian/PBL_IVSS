@@ -11,12 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_identifier = $_POST['username']; 
     $password = $_POST['password'];
 
-    $query = pg_query_params(
-        $koneksi, 
-        "SELECT * FROM users WHERE username=$1 OR email=$1", 
-        array($login_identifier)
+    $stmt = $koneksi->prepare(
+        "SELECT * FROM users WHERE username = :login_id OR email = :login_id"
     );
-    $user = pg_fetch_assoc($query);
+    $stmt->execute(['login_id' => $login_identifier]);
+    $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
@@ -118,10 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href=index.php" style="font-weight: 600;"><span>PBL</span></a>
+            <a class="navbar-brand" href="index.php" style="font-weight: 600;"><span>PBL</span></a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href=login.php">Login</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="login.php">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="register.php">Register</a></li>
                 </ul>
             </div>
