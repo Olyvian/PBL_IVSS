@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
-        header('Location: ../index.php');
+        header('Location: ../pages/dashboard.php');
         exit;
     } else {
         $error = "Email atau password salah.";
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <form method="POST">
-    <h2>Login</h2>
+    <h2>Login</h2>  
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger"><?= $error ?></div>
     <?php endif; ?>
