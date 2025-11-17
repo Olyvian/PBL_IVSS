@@ -1,10 +1,17 @@
 <?php
-include 'config/database.php';
+
+// Pastikan session_start() dipanggil di awal
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include '../config/database.php'; // Asumsi ini mendefinisikan $pdo atau $koneksi
 
 $message = '';
 
+// 1. Cek sesi: Jika sudah login, redirect
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.php"); 
+    header("Location: beranda.php"); 
     exit;
 }
 
@@ -12,43 +19,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_identifier = trim(htmlspecialchars($_POST['username'])); 
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare(
-        "SELECT * FROM users WHERE username = :login_id OR email = :login_id"
-    );
-    $stmt->execute(['login_id' => $login_identifier]);
-    $user = $stmt->fetch();
+    try {
+        // Gunakan satu variabel koneksi PDO, misalnya $pdo.
+        // Query disiapkan menggunakan placeholder untuk mencegah SQL Injection.
+        $stmt = $pdo->prepare(
+            "SELECT id, username, password, role FROM users WHERE username = :login_id OR email = :login_id"
+        );
+        $stmt->execute(['login_id' => $login_identifier]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch dalam mode associative
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        
-        $_SESSION['success_message'] = "Anda berhasil login"; 
-        
-        header("Location: index.php"); 
-        exit;
-    } else {
-        try {
-            $stmt = $koneksi->prepare(
-                "SELECT id, username, password, role FROM users WHERE username = :login_id OR email = :login_id"
-            );
-            $stmt->execute(['login_id' => $login_identifier]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role'] = $user['role'];
-                $_SESSION['success_message'] = "✅ Anda berhasil login!"; 
-                
-                header("Location: index.php"); 
-                exit;
-            } else {
-                $message = "❌ NIM/Email atau password salah!";
-            }
-        } catch (PDOException $e) {
-            $message = "❌ Terjadi kesalahan database. Mohon coba lagi.";
+        // 2. Verifikasi pengguna dan kata sandi
+        if ($user && password_verify($password, $user['password'])) {
+            // Login Berhasil
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            
+            // 3. REDIRECT LANGSUNG KE BERANDA.PHP
+            header("Location: beranda.php"); 
+            exit; // Penting untuk menghentikan eksekusi setelah header
+        } else {
+            // Username/Email ditemukan, tapi password salah, atau user tidak ditemukan
+            $message = "❌ Username/Email atau password salah!";
         }
+    } catch (PDOException $e) {
+        $message = "❌ Terjadi kesalahan database. Mohon coba lagi.";
+        // Untuk debugging, Anda bisa log $e->getMessage();
     }
 }
 ?>
