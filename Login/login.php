@@ -11,7 +11,14 @@ $message = '';
 
 // 1. Cek sesi: Jika sudah login, redirect
 if (isset($_SESSION['user_id'])) {
-    header("Location: beranda.php"); 
+    // Jika sudah login, langsung cek role untuk redirect
+    // (Ini opsional, tapi konsisten dengan logika baru)
+    $role = $_SESSION['role'] ?? ''; // Gunakan null coalescing untuk keamanan
+    if ($role === 'admin_lab' || $role === 'admin_berita') {
+        header("Location: ../pages/dashboard.php");
+    } else {
+        header("Location: beranda.php");
+    }
     exit;
 }
 
@@ -35,9 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             
-            // 3. REDIRECT LANGSUNG KE BERANDA.PHP
-            header("Location: beranda.php"); 
+            // 3. REDIRECT BERDASARKAN ROLE (INI YANG DIUBAH)
+            $role = $user['role'];
+
+            if ($role === 'admin_lab' || $role === 'admin_berita') {
+                header("Location: ../pages/dashboard.php");
+            } else {
+                // Default redirect (mencakup 'viewer' dan role lainnya)
+                header("Location: beranda.php");
+            }
             exit; // Penting untuk menghentikan eksekusi setelah header
+
         } else {
             // Username/Email ditemukan, tapi password salah, atau user tidak ditemukan
             $message = "❌ Username/Email atau password salah!";

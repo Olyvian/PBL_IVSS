@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
             // Gunakan variabel $pdo dari database.php
-            $insert_stmt = $koneksi->prepare(
+            $insert_stmt = $pdo->prepare(
                 "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)" 
             );
             

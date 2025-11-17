@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'koneksi.php';
+include 'pdo.php';
 
 $_SESSION = array();
 session_destroy();
