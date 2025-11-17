@@ -4,22 +4,17 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Logic untuk memeriksa sesi dan mengarahkan ke login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php"); 
-    exit;
-}
+// !!! LOGIC REDIRECT DIHAPUS !!!
+// Pengguna sekarang dapat mengakses halaman ini tanpa login.
 
-// Logic untuk pesan sukses
+// Logic untuk pesan sukses (tetap diperlukan jika login berhasil)
 $success_message = '';
 if (isset($_SESSION['success_message'])) {
     $success_message = $_SESSION['success_message'];
     unset($_SESSION['success_message']); 
 }
 
-// Mengambil nama pengguna untuk ditampilkan (Role sudah dihapus)
-$username = htmlspecialchars($_SESSION['username'] ?? 'User');
-
+// Variabel $username dipindahkan ke dalam blok HTML if-statement
 ?>
 
 <!DOCTYPE html>
@@ -129,10 +124,17 @@ $username = htmlspecialchars($_SESSION['username'] ?? 'User');
         </div>
         
         <div class="logout-container">
-            <span class="user-greeting">Haloo, <?php echo $username; ?></span> 
-            <a class="btn btn-sm btn-danger" href="logout.php">Logout</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <?php
+                // Mengambil nama pengguna untuk ditampilkan
+                $username = htmlspecialchars($_SESSION['username'] ?? 'User');
+                ?>
+                <span class="user-greeting">Haloo, <?php echo $username; ?></span>
+                <a class="btn-danger" href="logout.php">Logout</a>
+            <?php else: ?>
+                <a class="service-btn btn-filled" href="login.php" style="text-decoration: none;">Login</a>
+            <?php endif; ?>
         </div>
-        
         <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button> 
     </header>
 
