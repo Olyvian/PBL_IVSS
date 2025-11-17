@@ -79,8 +79,34 @@ if (isset($_GET['delete'])) {
 $stmt = $pdo->query("SELECT * FROM news ORDER BY published_at DESC");
 $newsList = $stmt->fetchAll();
 
+// ===== TAMBAHAN PHP (Hitung Total Berita) =====
+$totalBerita = count($newsList);
+// ===============================================
+
 include_once __DIR__ . '/../includes/admin/header.php';
 ?>
+
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fa-solid fa-newspaper"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-title">Total Berita</span>
+            <span class="stat-number"><?php echo $totalBerita; ?></span>
+        </div>
+    </div>
+    </div>
+<div class="card">
+
+    <div class="form-container" id="newsFormContainer">
+        </div>
+
+    <div class="card-body">
+        <table>
+            </table>
+    </div>
+</div>
 
 <div class="card">
     <div class="card-header">
