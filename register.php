@@ -1,5 +1,5 @@
 <?php
-include 'koneksi.php'; 
+include 'config/database.php'; 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "❌ Konfirmasi password tidak cocok!";
     } else {
         
-        $check_stmt = $koneksi->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
+        $check_stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
         $check_stmt->execute(['username' => $username, 'email' => $email]);
         
         if ($check_stmt->rowCount() > 0) {
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            $insert_stmt = $koneksi->prepare(
+            $insert_stmt = $pdo->prepare(
                 "INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, 'user')"
             );
             

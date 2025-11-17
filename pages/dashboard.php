@@ -4,7 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 
 // 2. Proteksi Halaman (sesuaikan role jika perlu)
-// redirectIfNotLoggedIn(['admin_news', 'admin_lab']); dimatikan
+redirectIfNotLoggedIn(['admin_berita', 'admin_lab']);
 
 // 3. (FLEKSIBEL) Set Judul Halaman dan Navigasi Aktif
 $pageTitle = 'Dashboard';

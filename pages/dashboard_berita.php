@@ -23,7 +23,7 @@ if (isLoggedIn() && !isset($_SESSION['username'])) {
 }
 
 // 3. Proteksi Halaman
-// redirectIfNotLoggedIn(['admin_berita', 'admin_lab']); // dimatikan untuk test desain
+redirectIfNotLoggedIn(['admin_berita', 'admin_lab']); // dimatikan untuk test desain
 
 // 4. Logika CRUD (Tambah/Edit) - Disesuaikan dengan DB Baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -179,7 +179,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <tr>
                     <td class="table-thumb-col">
                         <?php if (!empty($n['gambar_header'])): ?>
-                            <img src="../uploads/news_images/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
+                            <img src="../uploads/berita/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
                         <?php else: ?>
                             <span class="table-thumbnail-placeholder">No image</span>
                         <?php endif; ?>

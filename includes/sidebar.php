@@ -6,7 +6,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Ambil info user dari session (diasumsikan di-set saat login oleh auth.php)
 $username = $_SESSION['username'] ?? 'User';
-$role_name = $_SESSION['role'] ?? 'Admin'; // Menggunakan 'role' dari kode Anda
+// Pastikan kita mengambil $_SESSION['role'] yang di-set saat login
+$role_name = $_SESSION['role'] ?? 'viewer'; 
 
 // Variabel $pageTitle dan $activePage harus di-set OLEH HALAMAN
 // yang memanggil header.php ini.
@@ -36,7 +37,13 @@ $role_name = $_SESSION['role'] ?? 'Admin'; // Menggunakan 'role' dari kode Anda
     <div class="sidebar-light">
         <h3 class="sidebar-brand-light">Lab IVSS</h3>
         <ul class="nav-menu-light">
-            <!-- Link Dashboard Utama -->
+            
+            <!-- ================================================== -->
+            <!-- === LOGIKA ROLE DIMULAI DI SINI === -->
+            <!-- ================================================== -->
+
+            <!-- Link Dashboard Utama (Bisa dilihat oleh kedua admin) -->
+            <?php if ($role_name === 'admin_lab' || $role_name === 'admin_berita'): ?>
             <li>
                 <a href="dashboard.php" 
                    class="nav-link-light <?php echo ($activePage === 'dashboard') ? 'active' : ''; ?>">
@@ -44,7 +51,10 @@ $role_name = $_SESSION['role'] ?? 'Admin'; // Menggunakan 'role' dari kode Anda
                     <span>Dashboard</span>
                 </a>
             </li>
-            <!-- Link Member -->
+            <?php endif; ?>
+
+            <!-- Link Menu Khusus 'admin_lab' -->
+            <?php if ($role_name === 'admin_lab'): ?>
             <li>
                 <a href="dashboard_member.php" 
                    class="nav-link-light <?php echo ($activePage === 'member') ? 'active' : ''; ?>">
@@ -52,25 +62,13 @@ $role_name = $_SESSION['role'] ?? 'Admin'; // Menggunakan 'role' dari kode Anda
                     <span>Member</span>
                 </a>
             </li>
-            
-            <!-- Link Riset -->
             <li>
                 <a href="dashboard_riset.php" 
                    class="nav-link-light <?php echo ($activePage === 'riset') ? 'active' : ''; ?>">
-                    <i class="bi bi-journal-check"></i> 
+                    <i class="bi bi-flask"></i> <!-- Sesuai permintaan, ikon flask -->
                     <span>Riset</span>
                 </a>
             </li>
-
-            <!-- Link Berita -->
-            <li>
-                <a href="dashboard_berita.php" 
-                   class="nav-link-light <?php echo ($activePage === 'berita') ? 'active' : ''; ?>">
-                    <i class="bi bi-newspaper"></i>
-                    <span>Berita</span>
-                </a>
-            </li>
-            <!-- Link Pendaftaran (BARU) -->
             <li>
                 <a href="dashboard_pendaftaran.php" 
                    class="nav-link-light <?php echo ($activePage === 'pendaftaran') ? 'active' : ''; ?>">
@@ -78,9 +76,26 @@ $role_name = $_SESSION['role'] ?? 'Admin'; // Menggunakan 'role' dari kode Anda
                     <span>Pendaftaran</span>
                 </a>
             </li>
+            <?php endif; ?>
+
+            <!-- Link Menu Khusus 'admin_berita' -->
+            <?php if ($role_name === 'admin_berita'): ?>
+            <li>
+                <a href="dashboard_berita.php" 
+                   class="nav-link-light <?php echo ($activePage === 'berita') ? 'active' : ''; ?>">
+                    <i class="bi bi-newspaper"></i>
+                    <span>Berita</span>
+                </a>
+            </li>
+            <?php endif; ?>
+
+            <!-- ================================================== -->
+            <!-- === AKHIR LOGIKA ROLE === -->
+            <!-- ================================================== -->
+
         </ul>
         <div class="sidebar-footer-light">
-            <!-- Link Logout -->
+            <!-- Link Logout (Selalu Tampil) -->
             <a href="../logout.php" class="nav-link-light logout">
                 <i class="bi bi-box-arrow-left"></i>
                 <span>Log Out</span>

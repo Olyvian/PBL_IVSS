@@ -1,5 +1,5 @@
 <?php
-include 'koneksi.php';
+include 'config/database.php';
 
 $message = '';
 if (isset($_SESSION['user_id'])) {
@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_identifier = $_POST['username']; 
     $password = $_POST['password'];
 
-    $stmt = $koneksi->prepare(
+    $stmt = $pdo->prepare(
         "SELECT * FROM users WHERE username = :login_id OR email = :login_id"
     );
     $stmt->execute(['login_id' => $login_identifier]);
