@@ -65,7 +65,7 @@ $role_name = $_SESSION['role'] ?? 'viewer';
             <li>
                 <a href="dashboard_riset.php" 
                    class="nav-link-light <?php echo ($activePage === 'riset') ? 'active' : ''; ?>">
-                    <i class="bi bi-flask"></i> <!-- Sesuai permintaan, ikon flask -->
+                    <i class="bi bi-journal-check"></i> <!-- Sesuai permintaan, ikon flask -->
                     <span>Riset</span>
                 </a>
             </li>

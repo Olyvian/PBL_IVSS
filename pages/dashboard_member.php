@@ -1,12 +1,12 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
-// redirectIfNotLoggedIn(['admin_lab']); dimatikan buat test desain
+redirectIfNotLoggedIn(['admin_lab']); 
 
 // Set judul dan halaman aktif
 $pageTitle = 'Member';
 $activePage = 'member';
-$stmt = $pdo->query("SELECT * FROM anggota_lab ORDER BY created_at DESC");
+$stmt = $pdo->query("SELECT * FROM anggota_lab ORDER BY nama_lengkap ASC");
 $list = $stmt->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
