@@ -1,9 +1,8 @@
 <?php
-// --- TAHAP 1: INISIALISASI & AUTENTIKASI ---
 
 // 1. Panggil file config dan auth Anda
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../includes/auth.php'; // File auth Anda (tidak diubah)
+require_once __DIR__ . '/../includes/auth.php';
 
 // 2. Ambil data user untuk ditampilkan di header
 if (isLoggedIn() && !isset($_SESSION['username'])) {
@@ -25,9 +24,7 @@ if (isLoggedIn() && !isset($_SESSION['username'])) {
 }
 
 // 3. Panggil fungsi redirect dari auth.php
-redirectIfNotLoggedIn(['admin_news']);
-
-// --- TAHAP 2: LOGIKA CRUD (TAMBAH/EDIT/HAPUS) ---
+// redirectIfNotLoggedIn(['admin_news']);
 
 // 4. Logika CRUD (Tambah/Edit) - Jika ada data POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -78,13 +75,10 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// --- TAHAP 3: AMBIL DATA & TAMPILKAN HALAMAN ---
-
 // 6. Ambil semua data berita untuk ditampilkan di tabel
 $stmt = $pdo->query("SELECT * FROM news ORDER BY published_at DESC");
 $newsList = $stmt->fetchAll();
 
-// 7. Masukkan Header (HTML Mulai)
 include_once __DIR__ . '/../includes/admin/header.php';
 ?>
 
@@ -101,27 +95,22 @@ include_once __DIR__ . '/../includes/admin/header.php';
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="news_id" id="news_id">
             <input type="hidden" name="existing_image" id="existing_image">
-
             <div class="form-group">
                 <label for="title">Judul:</label>
                 <input type="text" name="title" id="title" class="form-control" required>
             </div>
-
             <div class="form-group">
                 <label for="content">Isi Berita:</label>
                 <textarea name="content" id="content" class="form-control" rows="5" required></textarea>
             </div>
-
             <div class="form-group">
                 <label for="image_input">Unggah Gambar:</label>
                 <input type="file" name="image" id="image_input" class="form-control">
             </div>
-
             <div id="image_preview_container" style="display:none; margin-top:10px;">
                 <p><strong>Preview Gambar:</strong></p>
                 <img id="image_preview" src="" alt="Preview">
             </div>
-
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Simpan</button>
                 <button type="button" class="btn btn-secondary" id="btnCancelForm">Batal</button>
@@ -135,15 +124,14 @@ include_once __DIR__ . '/../includes/admin/header.php';
                 <tr>
                     <th class="table-thumb-col">Thumbnail</th>
                     <th>Judul</th>
-                    <th class="table-date-col">Tanggal</th>
+                    <th>Isi Berita</th> <th class="table-date-col">Tanggal</th>
                     <th class="table-aksi-col">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($newsList)): ?>
                     <tr>
-                        <td colspan="4" class="empty-table">
-                            Belum ada berita.
+                        <td colspan="5" class="empty-table"> Belum ada berita.
                         </td>
                     </tr>
                 <?php endif; ?>
@@ -158,8 +146,20 @@ include_once __DIR__ . '/../includes/admin/header.php';
                         <?php endif; ?>
                     </td>
                     <td><?= htmlspecialchars($n['title']) ?></td>
-                    <td class="table-date-col"><?= date('d M Y', strtotime($n['published_at'])) ?></td>
                     
+                    <td>
+                        <?php
+                        // Potong isi berita agar tabel rapi
+                        $excerpt = strip_tags($n['content']);
+                        if (strlen($excerpt) > 80) {
+                            echo htmlspecialchars(substr($excerpt, 0, 80)) . '...';
+                        } else {
+                            echo htmlspecialchars($excerpt);
+                        }
+                        ?>
+                    </td>
+                    
+                    <td class="table-date-col"><?= date('d M Y', strtotime($n['published_at'])) ?></td>
                     <td class="table-aksi-col">
                         <a href="#" class="btn-icon btn-edit" title="Edit"
                            onclick='editNews(<?= $n['id'] ?>, <?= json_encode($n['title']) ?>, <?= json_encode($n['content']) ?>, <?= json_encode($n['image'] ?? '') ?>); return false;'>
@@ -170,7 +170,7 @@ include_once __DIR__ . '/../includes/admin/header.php';
                             <i class="fa-solid fa-trash-can"></i>
                         </a>
                     </td>
-                    </tr>
+                </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
