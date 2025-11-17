@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            $insert_stmt = $pdo->prepare(
-                "INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, 'user')"
+            $insert_stmt = $koneksi->prepare(
+                "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)" 
             );
             
             try {
@@ -33,7 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $message = "✅ Registrasi berhasil! Silakan <a href='login.php'>login</a>.";
             } catch (PDOException $e) {
-                $message = "❌ Registrasi gagal. Error: " . htmlspecialchars($e->getMessage());
+                if (strpos($e->getMessage(), 'violates check constraint') !== false) {
+                     $message = "❌ Registrasi gagal. Pastikan nilai 'role' yang diizinkan di database adalah 'User'.";
+                } else {
+                     $message = "❌ Registrasi gagal. Error: " . htmlspecialchars($e->getMessage());
+                }
             }
         }
     }
