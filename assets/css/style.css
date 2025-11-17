@@ -255,7 +255,9 @@ SOLUSI 1 (PENAMBAHANNYA DI SINI)
     color: var(--text-muted-light);
     padding: 3rem;
 }
-
+.hidden{
+    display:none;
+}
 /* Kolom Tabel (Sesuai Kode Anda) */
 .table-thumb-col { width: 140px; }
 .table-date-col { width: 170px; }
