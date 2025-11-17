@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($_FILES['gambar_header']['name'])) {
         $filename = uniqid() . '_' . basename($_FILES['gambar_header']['name']);
-        $uploadPath = __DIR__ . '/../uploads/news_images/' . $filename; // Pastikan folder ini ada
+        $uploadPath = __DIR__ . '/../uploads/berita/' . $filename; // Pastikan folder ini ada
         if (move_uploaded_file($_FILES['gambar_header']['tmp_name'], $uploadPath)) {
             $gambar_header = $filename;
         }
@@ -188,8 +188,8 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     <td>
                         <?php
                         $excerpt = strip_tags($n['isi']);
-                        if (strlen($excerpt) > 80) {
-                            echo htmlspecialchars(substr($excerpt, 0, 80)) . '...';
+                        if (strlen($excerpt) > 20) {
+                            echo htmlspecialchars(substr($excerpt, 0, 20)) . '...';
                         } else {
                             echo htmlspecialchars($excerpt);
                         }
@@ -217,62 +217,72 @@ include_once __DIR__ . '/../includes/sidebar.php';
     </div>
 </div>
 
-<!-- JavaScript untuk Form (ditaruh sebelum footer) -->
+<!-- script -->
 <script>
-    const formContainer = document.getElementById('newsFormContainer');
-    const btnShow = document.getElementById('btnShowForm');
-    const btnCancel = document.getElementById('btnCancelForm');
-    const formTitle = document.getElementById('formTitle');
-    const form = formContainer.querySelector('form');
-    
-    // Sesuaikan ID input
-    const inputId = document.getElementById('berita_id');
-    const inputJudul = document.getElementById('judul');
-    const inputIsi = document.getElementById('isi');
-    const inputTipe = document.getElementById('tipe'); // Input Tipe BARU
-    const inputImage = document.getElementById('image_input');
-    const inputExistingImage = document.getElementById('existing_gambar_header');
-    const previewContainer = document.getElementById('image_preview_container');
-    const previewImg = document.getElementById('image_preview');
+    const formContainer = document.getElementById('newsFormContainer');
+    const btnShow = document.getElementById('btnShowForm');
+    const btnCancel = document.getElementById('btnCancelForm');
+    const formTitle = document.getElementById('formTitle');
+    const form = formContainer.querySelector('form');
+    
+    // Sesuaikan ID input
+    const inputId = document.getElementById('berita_id');
+    const inputJudul = document.getElementById('judul');
+    const inputIsi = document.getElementById('isi');
+    const inputTipe = document.getElementById('tipe'); // Input Tipe BARU
+    const inputImage = document.getElementById('image_input');
+    const inputExistingImage = document.getElementById('existing_gambar_header');
+    const previewContainer = document.getElementById('image_preview_container');
+    const previewImg = document.getElementById('image_preview');
 
-    // Tampilkan form untuk TAMBAH
-    btnShow.addEventListener('click', () => {
-        form.reset();
-        inputId.value = '';
-        inputExistingImage.value = '';
-        formTitle.innerText = 'Tambah Berita Baru';
-        btnShow.innerText = 'Tutup Form';
-        previewContainer.style.display = 'none';
-        formContainer.style.display = 'block';
-        window.scrollTo(0, 0); // Gulung ke atas
-    });
+    // (DIUBAH) Tombol ini sekarang menjadi TOGGLE (Buka/Tutup)
+    btnShow.addEventListener('click', () => {
+        // Cek apakah form sedang terlihat (display === 'block')
+        if (formContainer.style.display === 'block') {
+            // JIKA TERLIHAT: Sembunyikan form
+            formContainer.style.display = 'none';
+            btnShow.innerText = 'Tambah Berita';
+            form.reset();
+        } else {
+            // JIKA TERSEMBUNYI: Tampilkan form (Logika 'Tambah')
+            form.reset();
+            inputId.value = '';
+            inputExistingImage.value = '';
+            formTitle.innerText = 'Tambah Berita Baru';
+            btnShow.innerText = 'Tutup Form';
+            previewContainer.style.display = 'none';
+            formContainer.style.display = 'block';
+            window.scrollTo(0, 0); // Gulung ke atas
+        }
+    });
 
-    // Tampilkan form untuk EDIT (di-update)
-    function editNews(id, judul, isi, gambar, tipe) {
-        form.reset();
-        inputId.value = id;
-        inputJudul.value = judul;
-        inputIsi.value = isi;
-        inputTipe.value = tipe; // Set Tipe BARU
-        inputExistingImage.value = gambar;
-        formTitle.innerText = 'Edit Berita';
-        btnShow.innerText = 'Tutup Form';
-        
-        if (gambar) {
-            previewImg.src = '../uploads/news_images/' + gambar;
-            previewContainer.style.display = 'block';
-        } else {
-            previewContainer.style.display = 'none';
-        }
-        
-        formContainer.style.display = 'block';
-        window.scrollTo(0, 0); // Gulung ke atas
-    }
+    // Tampilkan form untuk EDIT (Tidak berubah, tapi pastikan teks tombol benar)
+    function editNews(id, judul, isi, gambar, tipe) {
+        form.reset();
+        inputId.value = id;
+        inputJudul.value = judul;
+        inputIsi.value = isi;
+        inputTipe.value = tipe; // Set Tipe BARU
+        inputExistingImage.value = gambar;
+        formTitle.innerText = 'Edit Berita';
+        btnShow.innerText = 'Tutup Form'; // <--- Pastikan teks tombol di-update
+        
+        if (gambar) {
+            previewImg.src = '../uploads/news_images/' + gambar;
+            previewContainer.style.display = 'block';
+        } else {
+            previewContainer.style.display = 'none';
+        }
+        
+        // Selalu tampilkan form saat edit
+        formContainer.style.display = 'block'; 
+        window.scrollTo(0, 0); // Gulung ke atas
+    }
 
-    // Sembunyikan form
-    btnCancel.addEventListener('click', () => {
-        formContainer.style.display = 'none';
-        btnShow.innerText = 'Tambah Berita';
-        form.reset();
-    });
+    // Sembunyikan form (Fungsi 'Batal' ini sudah benar)
+    btnCancel.addEventListener('click', () => {
+        formContainer.style.display = 'none';
+        btnShow.innerText = 'Tambah Berita';
+        form.reset();
+    });
 </script>

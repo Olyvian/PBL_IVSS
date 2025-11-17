@@ -217,9 +217,13 @@ body {
 .form-actions { margin-top: 1.5rem; display: flex; gap: 10px; }
 #image_preview { max-width: 200px; height: auto; border-radius: 4px; }
 
-/* Card Body & Tabel (Sesuai Kode Anda) */
+/* ===============================================
+SOLUSI 1 (PENAMBAHANNYA DI SINI)
+=============================================== 
+*/
 .card-body {
     padding: 0;
+    overflow-x: auto; /* <-- BARIS INI DITAMBAHKAN */
 }
 
 .card-body table {
@@ -253,10 +257,10 @@ body {
 }
 
 /* Kolom Tabel (Sesuai Kode Anda) */
-.table-thumb-col { width: 250px; }
-.table-date-col { width: 250px; }
-.table-aksi-col { width: 150px; }
-.table-tipe-col { width: 250px; }
+.table-thumb-col { width: 140px; }
+.table-date-col { width: 170px; }
+.table-aksi-col { width: 130px; }
+.table-tipe-col { width: 80px; }
 
 .table-thumbnail {
     width: 100px;
