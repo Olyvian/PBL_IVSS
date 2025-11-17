@@ -1,0 +1,112 @@
+<?php
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+// redirectIfNotLoggedIn(['admin_lab']); dimatikan buat test desain
+
+// Logika Update Status
+if (isset($_GET['update_status']) && isset($_GET['id'])) {
+    $status = $_GET['update_status'];
+    $id = $_GET['id'];
+    // Pastikan status valid
+    if (in_array($status, ['diterima', 'ditolak'])) {
+        $stmt = $pdo->prepare("UPDATE pendaftaran_magang SET status = ? WHERE id = ?");
+        $stmt->execute([$status, $id]);
+    }
+    header('Location: dashboard_pendaftaran.php');
+    exit;
+}
+
+
+// Ambil semua data pendaftaran
+$stmt = $pdo->query("SELECT p.*, u.username 
+                     FROM pendaftaran_magang p
+                     JOIN users u ON p.user_id = u.id 
+                     ORDER BY p.tanggal_daftar DESC");
+$pendaftaranList = $stmt->fetchAll();
+
+// Hitung pendaftaran pending
+$totalPending = 0;
+foreach ($pendaftaranList as $p) {
+    if ($p['status'] == 'pending') {
+        $totalPending++;
+    }
+}
+
+// Set judul dan halaman aktif
+$pageTitle = 'Pendaftaran';
+$activePage = 'pendaftaran';
+
+// Panggil sidebar
+include_once __DIR__ . '/../includes/sidebar.php';
+?>
+
+<!-- Kartu Stat Pendaftaran Pending -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #6f42c1; background-color: #f1eef8;">
+            <i class="fa-solid fa-file-signature"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-title">Pendaftaran Pending</span>
+            <span class="stat-number"><?php echo $totalPending; ?></span>
+        </div>
+    </div>
+</div>
+
+<!-- Card Tabel Pendaftaran -->
+<div class="card">
+    <div class="card-header">
+        <div class="tabs">
+            <span class="tab-item active">Daftar Pendaftaran Magang</span>
+        </div>
+        <!-- Tidak ada tombol "Tambah" di sini -->
+    </div>
+
+    <!-- Tabel Daftar Pendaftaran -->
+    <div class="card-body">
+        <table>
+            <thead>
+                <tr>
+                    <th>Pendaftar (User)</th>
+                    <th>Nama Lengkap</th>
+                    <th>Universitas</th>
+                    <th>Status</th>
+                    <th class="table-date-col">Tanggal Daftar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($pendaftaranList)): ?>
+                    <tr><td colspan="6" class="empty-table">Belum ada pendaftaran.</td></tr>
+                <?php endif; ?>
+                <?php foreach ($pendaftaranList as $p): ?>
+                <tr>
+                    <td><?= htmlspecialchars($p['username']) ?></td>
+                    <td><?= htmlspecialchars($p['nama_lengkap']) ?></td>
+                    <td><?= htmlspecialchars($p['universitas']) ?></td>
+                    <td>
+                        <?php
+                        $status = $p['status'];
+                        $badge_class = 'bg-secondary'; // default
+                        if ($status == 'diterima') $badge_class = 'bg-success';
+                        if ($status == 'ditolak') $badge_class = 'bg-danger';
+                        if ($status == 'pending') $badge_class = 'bg-warning';
+                        ?>
+                        <span class="badge <?= $badge_class ?>"><?= htmlspecialchars($status) ?></span>
+                    </td>
+                    <td class="table-date-col"><?= date('d M Y', strtotime($p['tanggal_daftar'])) ?></td>
+                    <td>
+                        <!-- Asumsi CV ada di folder uploads/cv/ -->
+                        <a href="../uploads/cv/<?= htmlspecialchars($p['cv_file']) ?>" class="btn btn-sm btn-info" target="_blank">Lihat CV</a>
+                        
+                        <?php if ($p['status'] === 'pending'): ?>
+                            <a href="?update_status=diterima&id=<?= $p['id'] ?>" class="btn btn-sm btn-success" onclick="return confirm('Anda yakin ingin MENERIMA pendaftaran ini?')">Terima</a>
+                            <a href="?update_status=ditolak&id=<?= $p['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Anda yakin ingin MENOLAK pendaftaran ini?')">Tolak</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
