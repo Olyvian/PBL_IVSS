@@ -1,6 +1,6 @@
 <?php
 // Sertakan file konfigurasi koneksi
-require_once 'db_config.php';
+require_once 'db_config.php'; // Ini akan membuat objek $pdo (PDO PostgreSQL)
 
 // Atur header agar klien tahu responsnya adalah JSON
 header('Content-Type: application/json');
@@ -14,69 +14,59 @@ $response = [
     'facilities' => []
 ];
 
-// ===================================
-// 1. Ambil Data Visi
-// ===================================
-// Asumsi: Hanya ada 1 baris untuk Visi
-$sql_vision = "SELECT content FROM visions LIMIT 1";
-$result_vision = $conn->query($sql_vision);
+try {
+    // ===================================
+    // 1. Ambil Data Visi (Menggunakan PDO)
+    // ===================================
+    $stmt_vision = $pdo->prepare("SELECT content FROM visions LIMIT 1");
+    $stmt_vision->execute();
+    $vision_row = $stmt_vision->fetch(); 
 
-if ($result_vision && $result_vision->num_rows > 0) {
-    $row = $result_vision->fetch_assoc();
-    $response['vision'] = $row['content'];
-}
+    if ($vision_row) {
+        $response['vision'] = $vision_row['content'];
+    }
 
-// ===================================
-// 2. Ambil Data Misi
-// ===================================
-$sql_mission = "SELECT point FROM missions ORDER BY id ASC";
-$result_mission = $conn->query($sql_mission);
+    // ===================================
+    // 2. Ambil Data Misi (Menggunakan PDO)
+    // ===================================
+    $stmt_mission = $pdo->prepare("SELECT point FROM missions ORDER BY id ASC");
+    $stmt_mission->execute();
+    $mission_list = $stmt_mission->fetchAll();
 
-if ($result_mission && $result_mission->num_rows > 0) {
-    while($row = $result_mission->fetch_assoc()) {
+    foreach($mission_list as $row) {
         $response['mission'][] = $row['point'];
     }
+
+    // ===================================
+    // 3. Ambil Data Activities/Kegiatan (Menggunakan PDO)
+    // ===================================
+    $stmt_activities = $pdo->prepare("SELECT title, description FROM activities ORDER BY id DESC LIMIT 3"); 
+    $stmt_activities->execute();
+    $response['activities'] = $stmt_activities->fetchAll();
+
+    // ===================================
+    // 4. Ambil Data Lecturers/Dosen (Menggunakan PDO)
+    // ===================================
+    $stmt_lecturers = $pdo->prepare("SELECT name, expertise, image_url FROM lecturers ORDER BY id ASC");
+    $stmt_lecturers->execute();
+    $response['lecturers'] = $stmt_lecturers->fetchAll();
+
+
+    // ===================================
+    // 5. Ambil Data Facilities/Fasilitas (Menggunakan PDO)
+    // ===================================
+    $stmt_facilities = $pdo->prepare("SELECT name, description FROM facilities ORDER BY id ASC");
+    $stmt_facilities->execute();
+    $response['facilities'] = $stmt_facilities->fetchAll();
+
+} catch (PDOException $e) {
+    // Tangani error database dengan aman
+    http_response_code(500);
+    // Kirim pesan error yang aman ke klien. Pesan $e->getMessage() di-log di sisi server.
+    $response = ['error' => 'Database error', 'message' => 'Gagal memuat data dari server.'];
 }
 
-// ===================================
-// 3. Ambil Data Activities/Kegiatan
-// ===================================
-$sql_activities = "SELECT title, description FROM activities ORDER BY id DESC LIMIT 3"; // Batasi 3 untuk contoh
-$result_activities = $conn->query($sql_activities);
 
-if ($result_activities && $result_activities->num_rows > 0) {
-    while($row = $result_activities->fetch_assoc()) {
-        $response['activities'][] = $row;
-    }
-}
-
-// ===================================
-// 4. Ambil Data Lecturers/Dosen
-// ===================================
-$sql_lecturers = "SELECT name, expertise, image_url FROM lecturers ORDER BY id ASC";
-$result_lecturers = $conn->query($sql_lecturers);
-
-if ($result_lecturers && $result_lecturers->num_rows > 0) {
-    while($row = $result_lecturers->fetch_assoc()) {
-        $response['lecturers'][] = $row;
-    }
-}
-
-// ===================================
-// 5. Ambil Data Facilities/Fasilitas
-// ===================================
-$sql_facilities = "SELECT name, description FROM facilities ORDER BY id ASC";
-$result_facilities = $conn->query($sql_facilities);
-
-if ($result_facilities && $result_facilities->num_rows > 0) {
-    while($row = $result_facilities->fetch_assoc()) {
-        $response['facilities'][] = $row;
-    }
-}
-
-// Tutup koneksi
-$conn->close();
-
-// Output data sebagai JSON
+// Keluarkan hasil dalam format JSON
 echo json_encode($response);
 ?>

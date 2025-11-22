@@ -56,7 +56,7 @@ try {
         <div class="logo-container">
             <img src="logo_polinema.png" alt="Logo POLINEMA">
             <div class="text-identitas">
-                <h3>Intelligent Vision and Intelligent Systems</h3>
+                <h3>Intelligent Vision and Smart System</h3>
                 <h2>POLITEKNIK NEGERI MALANG</h2>
             </div>
         </div>
@@ -71,12 +71,12 @@ try {
             
             <li><a href="#">Member</a></li> 
 
-            <li><a href="berita-pengumuman.html">Berita dan Pengumuman</a></li>
+            <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
         </ul>
     </nav>
 
     <section class="hero-section">
-        <h1>Intelligent Vision and Intelligent Systems Laboratory</h1>
+        <h1>Intelligent Vision and Smart Systems Laboratory</h1>
     </section>
 
     <main class="main-content">
@@ -86,7 +86,7 @@ try {
         </div>
 
         <div class="content-area">
-            <h3>Selamat Datang di Laboratorium IVIS</h3>
+            <h3>Selamat Datang di Laboratorium IVSS</h3>
             <p>
                 Laboratorium Visi Cerdas dan Sistem Cerdas merupakan pusat riset dan pengembangan di bawah Jurusan Teknologi Informasi Politeknik Negeri Malang yang berfokus pada bidang intelligent vision, dan smart system. Laboratorium ini menjadi wadah bagi dosen dan mahasiswa untuk melakukan penelitian, pembelajaran, serta pelatihan dalam pengembangan sistem cerdas berbasis pengolahan citra dan kecerdasan buatan.
 
@@ -137,6 +137,7 @@ Penelitian di laboratorium ini mengintegrasikan computer vision, AI, dan IoT unt
         </section>
         </main>
 
+    
     <footer class="footer-polinema">
         <div class="footer-top">
             <div class="footer-identitas">
@@ -145,20 +146,15 @@ Penelitian di laboratorium ini mengintegrasikan computer vision, AI, dan IoT unt
                     <div class="text-identitas-footer">
                         <h3>JURUSAN TEKNOLOGI INFORMASI</h3>
                         <h2>POLITEKNIK NEGERI MALANG</h2>
+                        <h3>Jl. Soekarno Hatta No.9, Lowokwaru, Kota Malang</h3>
                     </div>
                 </div>
-                <div class="alamat-info">
-                    <p>BLU POLITEKNIK NEGERI MALANG</p>
-                    <p>Jl. Soekarno Hatta No.9, Lowokwaru, Kota Malang</p>
-                </div>
             </div>
-
             <div class="social-media">
-                <a href="#"><img src="yt.png" alt="YouTube"></a>
-                <a href="#"><img src="ig.jpeg" alt="Instagram"></a>
+                <a href="#"><img src="yt.png" alt="YouTube Icon"></a>
+                <a href="#"><img src="ig.jpeg" alt="Instagram Icon"></a>
             </div>
         </div>
-        
         <div class="footer-bottom-menu">
             <div class="menu-group">
                 <h4>Tentang JTI</h4>

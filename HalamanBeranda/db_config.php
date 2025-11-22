@@ -1,11 +1,10 @@
 <?php
 $host = 'localhost';
-$dbname = 'Lab_IVIS';  // Ganti sesuai nama DB PostgreSQL kamu
-$user = 'postgres';       // Default user PostgreSQL
-$pass = '11223344';  // Sesuaikan dengan password PostgreSQL
+$dbname = 'Lab_IVIS';  
+$user = 'postgres';       
+$pass = '11223344';  
 
 try {
-    // DSN untuk PostgreSQL
     $dsn = "pgsql:host=$host;dbname=$dbname;user=$user;password=$pass";
     $pdo = new PDO($dsn);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
