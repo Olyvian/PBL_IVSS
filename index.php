@@ -71,7 +71,7 @@ try {
             
             <li><a href="#">Member</a></li> 
 
-            <li><a href="berita-pengumuman.html">Berita dan Pengumuman</a></li>
+            <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
         </ul>
     </nav>
 
