@@ -36,6 +36,7 @@ CREATE TABLE riset (
   id SERIAL PRIMARY KEY,
   judul_riset VARCHAR(255) NOT NULL,
   deskripsi TEXT NOT NULL,
+  link_riset TYPE text,
   tanggal_mulai DATE NULL,
   tanggal_selesai DATE NULL
 );
