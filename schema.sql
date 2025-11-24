@@ -73,7 +73,7 @@ CREATE TABLE fasilitas_peralatan (
 
 -- 8. Tabel Visi dan Misi
 CREATE TABLE visi_misi (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     tipe VARCHAR(10) NOT NULL,
     konten_id INT NOT NULL,
     deskripsi TEXT

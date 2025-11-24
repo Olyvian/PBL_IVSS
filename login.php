@@ -15,7 +15,7 @@ if (isset($_SESSION['user_id'])) {
     // (Ini opsional, tapi konsisten dengan logika baru)
     $role = $_SESSION['role'] ?? ''; // Gunakan null coalescing untuk keamanan
     if ($role === 'admin_lab' || $role === 'admin_berita') {
-        header("Location: ../pages/dashboard.php");
+        header("Location:pages/dashboard.php");
     } else {
         header("Location: beranda.php");
     }
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $role = $user['role'];
 
             if ($role === 'admin_lab' || $role === 'admin_berita') {
-                header("Location: ../pages/dashboard.php");
+                header("Location: pages/dashboard.php");
             } else {
                 // Default redirect (mencakup 'viewer' dan role lainnya)
                 header("Location: beranda.php");
