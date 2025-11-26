@@ -82,7 +82,7 @@ try {
             
             <li><a href="#">Riset dan Penelitian</a></li>
             
-            <li><a href="#">Member</a></li> 
+            <li><a href="member.php">Member</a></li> 
 
             <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
         </ul>

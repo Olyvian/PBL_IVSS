@@ -40,19 +40,6 @@ $activePage = 'pendaftaran';
 include_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<!-- Kartu Stat Pendaftaran Pending -->
-<div class="dashboard-grid">
-    <div class="stat-card">
-        <div class="stat-icon" style="color: #6f42c1; background-color: #f1eef8;">
-            <i class="fa-solid fa-file-signature"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Pendaftaran Pending</span>
-            <span class="stat-number"><?php echo $totalPending; ?></span>
-        </div>
-    </div>
-</div>
-
 <!-- Card Tabel Pendaftaran -->
 <div class="card">
     <div class="card-header">
@@ -69,7 +56,6 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <tr>
                     <th>Pendaftar (User)</th>
                     <th>Nama Lengkap</th>
-                    <th>Universitas</th>
                     <th>Status</th>
                     <th class="table-date-col">Tanggal Daftar</th>
                     <th>Aksi</th>
@@ -83,7 +69,6 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <tr>
                     <td><?= htmlspecialchars($p['username']) ?></td>
                     <td><?= htmlspecialchars($p['nama_lengkap']) ?></td>
-                    <td><?= htmlspecialchars($p['universitas']) ?></td>
                     <td>
                         <?php
                         $status = $p['status'];

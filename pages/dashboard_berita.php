@@ -93,19 +93,6 @@ include_once __DIR__ . '/../includes/sidebar.php';
 
 <!-- 10. (FLEKSIBEL) Konten Halaman Ini -->
 
-<!-- Kartu Stat Total Berita (Sesuai Permintaan) -->
-<div class="dashboard-grid">
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class="fa-solid fa-newspaper"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Total Berita</span>
-            <span class="stat-number"><?php echo $totalBerita; ?></span>
-        </div>
-    </div>
-</div>
-
 <!-- Card Tabel & Form (Kode Anda sebelumnya, di-update) -->
 <div class="card">
     <div class="card-header">

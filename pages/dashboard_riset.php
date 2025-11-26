@@ -196,18 +196,6 @@ $totalRiset = count($riset_data);
 include_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<div class="dashboard-grid">
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class="fa-solid fa-flask"></i> 
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Total Riset</span>
-            <span class="stat-number"><?php echo $totalRiset; ?></span>
-        </div>
-    </div>
-</div>
-
 <div class="card">
     <div class="card-header">
         <div class="tabs">
