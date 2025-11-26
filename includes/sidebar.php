@@ -96,7 +96,7 @@ $role_name = $_SESSION['role'] ?? 'viewer';
         </ul>
         <div class="sidebar-footer-light">
             <!-- Link Logout (Selalu Tampil) -->
-            <a href="logout.php" class="nav-link-light logout">
+            <a href="../logout.php" class="nav-link-light logout">
                 <i class="bi bi-box-arrow-left"></i>
                 <span>Log Out</span>
             </a>

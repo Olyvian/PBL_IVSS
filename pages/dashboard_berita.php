@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($_FILES['gambar_header']['name'])) {
         $filename = uniqid() . '_' . basename($_FILES['gambar_header']['name']);
-        $uploadPath = __DIR__ . '/../uploads/berita/' . $filename; // Pastikan folder ini ada
+        $uploadPath = __DIR__ . '/../uploads/news_images/' . $filename; // Pastikan folder ini ada
         if (move_uploaded_file($_FILES['gambar_header']['tmp_name'], $uploadPath)) {
             $gambar_header = $filename;
         }
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['berita_id'])) {
         // Mode EDIT
         $id = $_POST['berita_id'];
-        if ($gambar_header === null) {
+        if ($gambar_header == null) {
             $gambar_header = $_POST['existing_gambar_header'] ?? null;
         }
         $stmt = $pdo->prepare("UPDATE berita SET judul = ?, isi = ?, gambar_header = ?, tipe = ? WHERE id = ?");
@@ -179,7 +179,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <tr>
                     <td class="table-thumb-col">
                         <?php if (!empty($n['gambar_header'])): ?>
-                            <img src="../uploads/berita/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
+                            <img src="../uploads/news_images/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
                         <?php else: ?>
                             <span class="table-thumbnail-placeholder">No image</span>
                         <?php endif; ?>

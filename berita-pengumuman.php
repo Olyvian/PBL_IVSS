@@ -6,7 +6,7 @@ $news_list = [];
 
 try {
     // Ambil berita terbaru sebagai featured
-    $query_featured = $pdo->prepare("SELECT * FROM berita ORDER BY tanggal DESC LIMIT 1");
+    $query_featured = $pdo->prepare("SELECT * FROM berita ORDER BY created_at DESC LIMIT 1");
     $query_featured->execute();
     $featured = $query_featured->fetch();
 
@@ -14,7 +14,7 @@ try {
         $has_featured = true;
         
         // Ambil berita lainnya
-        $query_list = $pdo->prepare("SELECT * FROM berita WHERE id != :id_featured ORDER BY tanggal DESC");
+        $query_list = $pdo->prepare("SELECT * FROM berita WHERE id != :id_featured ORDER BY created_at DESC");
         $query_list->execute(['id_featured' => $featured['id']]);
         $news_list = $query_list->fetchAll();
     } else {
@@ -22,7 +22,7 @@ try {
         $featured = [
             'gambar' => 'image_793324.png', // Ganti dengan gambar placeholder Anda
             'judul' => 'Belum Ada Berita Terbaru',
-            'tanggal' => date('Y-m-d'),
+            'created_at' => date('Y-m-d'),
             'deskripsi' => 'Saat ini belum ada berita atau pengumuman yang tersedia di database.',
             'link' => '#'
         ];
@@ -40,13 +40,13 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Berita dan Pengumuman - Laboratorium IVSS</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style_profil.css">
 </head>
 <body>
 
 <header class="header-institusi">
     <div class="logo-container">
-        <img src="logo_polinema.png" alt="Logo POLINEMA">
+        <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
         <div class="text-identitas">
             <h3>Intelligent Vision and Smart System</h3>
             <h2>POLITEKNIK NEGERI MALANG</h2>
@@ -80,7 +80,7 @@ try {
             <img src="<?= $featured['gambar'] ?>" alt="Gambar Berita Utama">
             <div class="featured-news-content">
                 <h4><?= $featured['judul'] ?></h4>
-                <span class="date-meta"><?= date("d F Y", strtotime($featured['tanggal'])) ?></span>
+                <span class="date-meta"><?= date("d F Y", strtotime($featured['created_at'])) ?></span>
                 <p><?= $featured['deskripsi'] ?></p>
                 <a href="<?= $featured['link'] ?>">Baca Selengkapnya →</a>
             </div>
@@ -102,7 +102,7 @@ try {
                 <img src="<?= $news['gambar'] ?>" alt="Thumbnail Berita">
                 <div class="news-item-content">
                     <h4><?= $news['judul'] ?></h4>
-                    <span class="date-meta"><?= date("d F Y", strtotime($news['tanggal'])) ?></span>
+                    <span class="date-meta"><?= date("d F Y", strtotime($news['created_at'])) ?></span>
                     <p><?= $news['deskripsi'] ?></p>
                     <a href="<?= $news['link'] ?>">Baca Selengkapnya →</a>
                 </div>
@@ -117,7 +117,7 @@ try {
         <div class="footer-top">
             <div class="footer-identitas">
                 <div class="logo-container-footer">
-                    <img src="logo_polinema.png" alt="Logo POLINEMA">
+                    <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
                     <div class="text-identitas-footer">
                         <h3>JURUSAN TEKNOLOGI INFORMASI</h3>
                         <h2>POLITEKNIK NEGERI MALANG</h2>

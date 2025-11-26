@@ -56,7 +56,7 @@ try {
         <div class="logo-container">
             <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
             <div class="text-identitas">
-                <h3>Intelligent Vision and Intelligent Systems</h3>
+                <h3>Intelligent Vision and Smart Systems</h3>
                 <h2>POLITEKNIK NEGERI MALANG</h2>
             </div>
         </div>
@@ -69,7 +69,7 @@ try {
                 <span class="user-greeting">Haloo, <?php echo $username; ?></span>
                 <a class="btn-danger" href="logout.php">Logout</a>
             <?php else: ?>
-                <a class="service-btn btn-filled"  href="login.php" style="text-decoration: none;">Login</a>
+                <a class="service-btn btn-filled" href="login.php" style="text-decoration: none;">Login</a>
             <?php endif; ?>
         </div>
         <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button> 
@@ -89,7 +89,7 @@ try {
     </nav>
 
     <section class="hero-section">
-        <h1>Intelligent Vision and Intelligent Systems Laboratory</h1>
+        <h1>Intelligent Vision and Smart Systems Laboratory</h1>
     </section>
 
     <main class="main-content">
@@ -99,7 +99,7 @@ try {
         </div>
 
         <div class="content-area">
-            <h3>Selamat Datang di Laboratorium IVIS</h3>
+            <h3>Selamat Datang di Laboratorium IVSS</h3>
             <p>
                 Laboratorium Visi Cerdas dan Sistem Cerdas merupakan pusat riset dan pengembangan di bawah Jurusan Teknologi Informasi Politeknik Negeri Malang yang berfokus pada bidang intelligent vision, dan smart system. Laboratorium ini menjadi wadah bagi dosen dan mahasiswa untuk melakukan penelitian, pembelajaran, serta pelatihan dalam pengembangan sistem cerdas berbasis pengolahan citra dan kecerdasan buatan.
 
