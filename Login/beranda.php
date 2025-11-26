@@ -111,7 +111,7 @@ try {
         </section>
 
         <section class="info-section">
-            <h3 class="section-title">Fasilitas & Peralatan Laboratorium IVIS</h3>
+            <h3 class="section-title">Fasilitas & Peralatan Laboratorium IVSS</h3>
 
             <div class="grid-container">
                 
