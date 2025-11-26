@@ -30,7 +30,7 @@ $role_name = $_SESSION['role'] ?? 'viewer';
     <div class="sidebar-light">
         
         <div class="sidebar-brand-light" style="text-align: center; padding: 20px 0;">
-            <img src="#" alt="Logo Lab IVSS" style="max-width: 100%; height: auto; max-height: 100px; object-fit: contain;">
+            <img src="../assets/img/logo_ivss_tanpa_text.png" alt="Logo Lab IVSS" style="max-width: 100%; height: auto; max-height: 100px; object-fit: contain;">
         </div>
         <ul class="nav-menu-light">
             
@@ -80,7 +80,7 @@ $role_name = $_SESSION['role'] ?? 'viewer';
 
             </ul>
         <div class="sidebar-footer-light">
-            <a href="../logout.php" class="nav-link-light logout">
+            <a href="../login/logout.php" class="nav-link-light logout">
                 <i class="bi bi-box-arrow-left"></i>
                 <span>Log Out</span>
             </a>

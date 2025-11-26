@@ -14,7 +14,7 @@ if (isLoggedIn() && !isset($_SESSION['username'])) {
             $_SESSION['role'] = $user['role']; 
         } else {
             session_destroy();
-            header('Location: login.php');
+            header('Location: ../Login/login.php');
             exit;
         }
     } catch (PDOException $e) {

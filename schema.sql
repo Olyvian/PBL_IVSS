@@ -69,8 +69,8 @@ CREATE TABLE fasilitas_peralatan (
     id SERIAL PRIMARY KEY,
     jenis VARCHAR(50) NOT NULL,            
     judul VARCHAR(255) NOT NULL,           
-    deskripsi TEXT,                       
-    ikon_fa VARCHAR(50)                   
+    deskripsi TEXT,
+    ikon_fa VARCHAR(255)                   
 );
 
 -- 8. Tabel Visi dan Misi

@@ -1,0 +1,119 @@
+<?php
+// --- Bagian Logic Session ---
+// Cek status session, jalankan jika belum aktif
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Menentukan Title Halaman secara dinamis
+// Jika halaman induk tidak mendefinisikan $page_title, gunakan default
+$title = isset($page_title) ? $page_title : 'Laboratorium IVSS - POLINEMA';
+
+// Logic Username
+$username_display = 'User';
+if (isset($_SESSION['user_id'])) {
+    // Menggunakan operator coalescing null (??) untuk keamanan
+    $username_display = htmlspecialchars($_SESSION['username'] ?? 'User');
+}
+?>
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $title; ?></title>
+    
+    <link rel="stylesheet" href="style.css"> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- Bagian CSS Navbar & Header (Diambil dari beranda.php agar konsisten) --- */
+        
+        .header-institusi {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Pastikan padding kanan konsisten */
+            padding-right: 20px; 
+        }
+        .logout-container {
+            display: flex;
+            align-items: center;
+        }
+        .user-greeting {
+            color: #fff; 
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* Navbar Centering */
+        .navbar {
+            display: flex;
+            justify-content: center; 
+            background-color: #0d364a; 
+        }
+        .navbar ul {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0; 
+            list-style: none;
+            margin: 0;
+        }
+        .navbar li {
+            padding: 0 15px;
+            position: relative;
+        }
+        
+        .navbar li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 15px 0;
+            display: block; 
+            transition: border-bottom 0.2s;
+        }
+
+        .navbar li a:hover,
+        /* Tambahkan style untuk kelas 'active' */
+
+        .navbar li.has-dropdown > a {
+            padding-right: 20px;
+        }
+        
+        /* CSS Umum Tambahan */
+        .main-content {
+            padding-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-institusi">
+        <div class="logo-container">
+            <img src="logo_polinema.png" alt="Logo POLINEMA">
+            <div class="text-identitas">
+                <h3>Intelligent Vision and Smart Systems</h3>
+                <h2>POLITEKNIK NEGERI MALANG</h2>
+            </div>
+        </div>
+        
+        <div class="logout-container">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <span class="user-greeting">Haloo, <?php echo $username_display; ?></span>
+                <a class="btn-danger" href="logout.php">Logout</a>
+            <?php else: ?>
+                <a class="service-btn btn-filled" href="login.php" style="text-decoration: none;">Login</a>
+            <?php endif; ?>
+        </div>
+        <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button> 
+    </header>
+
+    <nav class="navbar" id="main-navbar">
+        <ul>
+            <li><a href="beranda.php">Beranda</a></li>
+            <li><a href="#">Riset dan Penelitian</a></li>
+            <li><a href="member.php">Member</a></li>
+            <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
+        </ul>
+    </nav>

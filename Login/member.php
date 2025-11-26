@@ -1,18 +1,40 @@
 <?php 
 // 1. Koneksi Database
-include "config/database.php";
+// Pastikan file config/database.php berisi logic koneksi PDO Anda
+include "../config/database.php"; 
 
 $members = [];
 
 try {
     // 2. Query Ambil Semua Member
-    // Diurutkan berdasarkan status (aktif dulu) lalu nama
-    $stmt = $pdo->prepare("SELECT * FROM anggota_lab ORDER BY status ASC, nama_lengkap ASC");
+    // Menggunakan SELECT spesifik untuk keamanan, dan ORDER BY CASE untuk memastikan 
+    // anggota 'aktif' selalu di urutan terdepan, lalu diurutkan berdasarkan nama.
+    $stmt = $pdo->prepare("SELECT id, nama_lengkap, posisi, bio, foto_profil, status 
+                          FROM anggota_lab 
+                          ORDER BY 
+                            CASE 
+                              WHEN status = 'aktif' THEN 1 
+                              ELSE 2 
+                            END, 
+                            nama_lengkap ASC");
     $stmt->execute();
-    $members = $stmt->fetchAll();
+    $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
+    // Tampilkan error database hanya saat development. 
+    // Di lingkungan produksi, ganti dengan pesan user-friendly dan log error.
     die("Error Database: " . $e->getMessage());
+}
+
+// Fungsi sederhana untuk memotong teks tanpa memotong di tengah kata
+function trim_text($text, $length) {
+    if (strlen($text) <= $length) {
+        return $text;
+    }
+    // Cari posisi spasi terakhir sebelum batas panjang
+    $last_space = strrpos(substr($text, 0, $length), ' ');
+    $trimmed_text = substr($text, 0, $last_space);
+    return $trimmed_text . '...';
 }
 ?>
 
@@ -23,12 +45,14 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member - Laboratorium IVSS</title>
     
-    <link rel="stylesheet" href="assets/css/style_profil.css">
+    <link rel="stylesheet" href="../assets/css/style_profil.css"> 
 
     <style>
+        /* --- Styling Khusus Member Grid --- */
+
         .member-grid {
             display: grid;
-            /* Grid responsif, minimal lebar kartu 250px */
+            /* Grid responsif, minimal lebar kartu 260px */
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
             gap: 30px;
             margin-top: 20px;
@@ -41,7 +65,7 @@ try {
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-align: center; /* Teks rata tengah untuk profil */
+            text-align: center; 
             display: flex;
             flex-direction: column;
         }
@@ -98,8 +122,10 @@ try {
             color: #34495E; /* var(--text-dark) */
             line-height: 1.5;
             margin-bottom: 15px;
+            text-align: justify;
+            /* CSS untuk membatasi tampilan bio menjadi 3 baris */
             display: -webkit-box;
-            -webkit-line-clamp: 3; /* Batasi bio max 3 baris */
+            -webkit-line-clamp: 3; 
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -130,27 +156,11 @@ try {
 </head>
 <body>
 
-<header class="header-institusi">
-    <div class="logo-container">
-        <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
-        <div class="text-identitas">
-            <h3>Intelligent Vision and Smart System</h3>
-            <h2>POLITEKNIK NEGERI MALANG</h2>
-        </div>
-    </div>
-    <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
-</header>
-
-<nav class="navbar" id="main-navbar">
-    <ul>
-        <li><a href="index.php">Beranda</a></li>
-        <li><a href="#">Riset dan Penelitian</a></li>
-        
-        <li class="active"><a href="member.php">Member</a></li> 
-
-        <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
-    </ul>
-</nav>
+<?php 
+// INCLUDE FILE HEADER.PHP
+// Memanggil header dan navigasi dari file terpisah
+include '../includes/header.php'; 
+?>
 
 <section class="hero-section">
     <h1>Our Laboratory Members & Team</h1>
@@ -171,9 +181,10 @@ try {
             <div class="member-card">
                 <div class="member-img-container">
                     <?php 
+                        // Tentukan path foto profil atau gunakan default
                         $foto = !empty($m['foto_profil']) 
                                 ? 'uploads/profile/' . $m['foto_profil'] 
-                                : 'assets/img/default-profile.png'; // Pastikan ada gambar default
+                                : 'assets/img/default-profile.png'; 
                     ?>
                     <img src="<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($m['nama_lengkap']) ?>" class="member-img">
                 </div>
@@ -183,27 +194,33 @@ try {
                     <div class="member-role"><?= htmlspecialchars($m['posisi']) ?></div>
                     
                     <p class="member-bio">
-                        <?= htmlspecialchars(substr(strip_tags($m['bio']), 0, 80)) ?>...
+                        <?php 
+                            // Tampilkan bio yang sudah dibersihkan dari tag HTML dan dipotong
+                            $clean_bio = strip_tags($m['bio']);
+                            echo htmlspecialchars(trim_text($clean_bio, 80));
+                        ?>
                     </p>
 
-                    <?php if ($m['status'] == 'aktif'): ?>
+                    <?php if (isset($m['status']) && $m['status'] == 'aktif'): ?>
                         <span class="status-badge status-aktif">Aktif</span>
-                    <?php else: ?>
+                    <?php elseif (isset($m['status']) && $m['status'] == 'alumni'): ?>
                         <span class="status-badge status-alumni">Alumni</span>
+                    <?php else: ?>
+                        <span class="status-badge status-aktif">Aktif</span>
                     <?php endif; ?>
                 </div>
             </div>
             <?php endforeach; ?>
 
         </div>
-        </div>
+    </div>
 </main>
 
 <footer class="footer-polinema">
     <div class="footer-top">
         <div class="footer-identitas">
             <div class="logo-container-footer">
-                <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
+                <img src="../assets/img/logo_polinema.png" alt="Logo POLINEMA">
                 <div class="text-identitas-footer">
                     <h3>JURUSAN TEKNOLOGI INFORMASI</h3>
                     <h2>POLITEKNIK NEGERI MALANG</h2>
@@ -212,8 +229,8 @@ try {
             </div>
         </div>
         <div class="social-media">
-            <a href="#"><img src="HalamanBeranda/yt.png" alt="YouTube Icon"></a>
-            <a href="#"><img src="HalamanBeranda/ig.jpeg" alt="Instagram Icon"></a>
+            <a href="#"><img src="../assets/img/yt.png" alt="YouTube Icon"></a> 
+            <a href="#"><img src="../assets/img/ig.jpeg" alt="Instagram Icon"></a>
         </div>
     </div>
     <div class="footer-bottom-menu">
@@ -221,11 +238,11 @@ try {
             <h4>Tentang JTI</h4>
             <ul>
                 <li><a href="#">Sejarah</a></li>
-                <li><a href="#">Visi, Misi & Tujuan</a></li>
+                <li><a href="#">Visi, Misi & Tujuan</a></li> 
                 <li><a href="#">Struktur Organisasi</a></li>
                 <li><a href="#">Tenaga Pengajar</a></li>
                 <li><a href="#">Tenaga Kependidikan</a></li>
-                <li><a href="#">Sarana & Prasarana</a></li>
+                <li><a href="#">Sarana & Prasarana</a></li> 
             </ul>
         </div>
 
