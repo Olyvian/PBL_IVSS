@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../config/mail.php';
 // redirectIfNotLoggedIn(['admin_lab']); dimatikan buat test desain
 
 // Logika Update Status
@@ -11,6 +12,8 @@ if (isset($_GET['update_status']) && isset($_GET['id'])) {
     if (in_array($status, ['diterima', 'ditolak'])) {
         $stmt = $pdo->prepare("UPDATE pendaftaran_magang SET status = ? WHERE id = ?");
         $stmt->execute([$status, $id]);
+        $mail->addAddress($_GET['email']);
+        $mail->send();
     }
     header('Location: dashboard_pendaftaran.php');
     exit;
@@ -79,14 +82,22 @@ include_once __DIR__ . '/../includes/sidebar.php';
                         ?>
                         <span class="badge <?= $badge_class ?>"><?= htmlspecialchars($status) ?></span>
                     </td>
-                    <td class="table-date-col"><?= date('d M Y', strtotime($p['tanggal_daftar'])) ?></td>
+                    <td class="table-date-col"><?= date('d M Y', strtotime(datetime: $p['tanggal_daftar'])) ?></td>
                     <td>
                         <!-- Asumsi CV ada di folder uploads/cv/ -->
                         <a href="../uploads/cv/<?= htmlspecialchars($p['cv_file']) ?>" class="btn btn-sm btn-info" target="_blank">Lihat CV</a>
-                        
+
+                        <?php 
+                        $stmt = $pdo->prepare('SELECT email from users WHERE id = :user_id LIMIT 1');
+
+                        $email=$stmt->execute(['user_id' => $p['user_id']]);
+
+                        $user = $stmt->fetch(); 
+                        ?>
+
                         <?php if ($p['status'] === 'pending'): ?>
-                            <a href="?update_status=diterima&id=<?= $p['id'] ?>" class="btn btn-sm btn-success" onclick="return confirm('Anda yakin ingin MENERIMA pendaftaran ini?')">Terima</a>
-                            <a href="?update_status=ditolak&id=<?= $p['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Anda yakin ingin MENOLAK pendaftaran ini?')">Tolak</a>
+                            <a href="?update_status=diterima&id=<?= $p['id'] ?>&email=<?= $user['email'] ?>" class="btn btn-sm btn-success" onclick="return confirm('Anda yakin ingin MENERIMA pendaftaran ini?')">Terima</a>
+                            <a href="?update_status=ditolak&id=<?= $p['id'] ?>&email=<?= $user['email'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Anda yakin ingin MENOLAK pendaftaran ini?')">Tolak</a>
                         <?php endif; ?>
                     </td>
                 </tr>

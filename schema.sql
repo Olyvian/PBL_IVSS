@@ -19,7 +19,7 @@ CREATE TABLE anggota_lab (
   status VARCHAR(20) NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif', 'alumni')),
   CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
-
+ALTER TABLE anggota_lab ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif', 'alumni'));
 -- 3. Tabel Berita
 CREATE TABLE berita (
   id SERIAL PRIMARY KEY,
