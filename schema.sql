@@ -56,7 +56,6 @@ CREATE TABLE pendaftaran_magang (
   id SERIAL PRIMARY KEY,
   user_id INT NOT NULL,
   nama_lengkap VARCHAR(100) NOT NULL,
-  universitas VARCHAR(100) NOT NULL,
   cv_file VARCHAR(255) NOT NULL,
   motivasi TEXT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'diterima', 'ditolak')),
