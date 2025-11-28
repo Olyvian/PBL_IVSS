@@ -182,8 +182,8 @@ include '../includes/header.php';
                     <?php 
                         // Tentukan path foto profil atau gunakan default
                         $foto = !empty($m['foto_profil']) 
-                                ? 'uploads/profile/' . $m['foto_profil'] 
-                                : 'assets/img/default-profile.png'; 
+                                ? '../uploads/profile/' . $m['foto_profil'] 
+                                : '../assets/img/default-profile.png'; 
                     ?>
                     <img src="<?= htmlspecialchars($foto) ?>" alt="<?= htmlspecialchars($m['nama_lengkap']) ?>" class="member-img">
                 </div>
