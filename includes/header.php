@@ -91,29 +91,34 @@ if (isset($_SESSION['user_id'])) {
 
     <header class="header-institusi">
         <div class="logo-container">
-            <img src="../assets/img/logo_polinema.png" alt="Logo POLINEMA">
+            <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
             <div class="text-identitas">
                 <h3>Intelligent Vision and Smart Systems</h3>
                 <h2>POLITEKNIK NEGERI MALANG</h2>
             </div>
         </div>
-        
-        <div class="logout-container">
+        <div class="logout-container" style="margin-left: auto;">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="user-greeting">Haloo, <?php echo $username_display; ?></span>
+                <?php
+                // Mengambil nama pengguna untuk ditampilkan
+                $username = htmlspecialchars($_SESSION['username'] ?? 'User');
+                ?>
+                <span class="user-greeting">Haloo, <?php echo $username; ?></span>
                 <a class="btn-danger" href="logout.php">Logout</a>
             <?php else: ?>
                 <a class="service-btn btn-filled" href="login.php" style="text-decoration: none;">Login</a>
             <?php endif; ?>
         </div>
-        <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button> 
     </header>
 
     <nav class="navbar" id="main-navbar">
         <ul>
-            <li><a href="beranda.php">Beranda</a></li>
+            <li class="active"><a href="index.php">Beranda</a></li>
+            
             <li><a href="#">Riset dan Penelitian</a></li>
-            <li><a href="member.php">Member</a></li>
+            
+            <li><a href="member.php">Member</a></li> 
+
             <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
         </ul>
     </nav>

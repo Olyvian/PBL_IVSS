@@ -1,12 +1,12 @@
 <?php
 $host = 'localhost';
-$dbname = 'ivss';  // Ganti sesuai nama DB PostgreSQL kamu
+$dbname = 'lab_profile';  // Ganti sesuai nama DB PostgreSQL kamu
 $user = 'postgres';       // Default user PostgreSQL
-$pass = 'postgre';  // Sesuaikan dengan password PostgreSQL
+$pass = '12345678';  // Sesuaikan dengan password PostgreSQL
 
 try {
     // DSN untuk PostgreSQL
-    $dsn = "pgsql:host=$host;dbname=$dbname;user=$user;password=$pass;port=5444";
+    $dsn = "pgsql:host=$host;dbname=$dbname;user=$user;password=$pass;port=5432";
     $pdo = new PDO($dsn);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);

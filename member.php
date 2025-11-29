@@ -2,6 +2,7 @@
 // 1. Koneksi Database
 // Pastikan file config/database.php berisi logic koneksi PDO Anda
 include "config/database.php"; 
+include 'includes/header.php'; 
 
 $members = [];
 
@@ -154,12 +155,6 @@ function trim_text($text, $length) {
     </style>
 </head>
 <body>
-
-<?php 
-// INCLUDE FILE HEADER.PHP
-// Memanggil header dan navigasi dari file terpisah
-include 'includes/header.php'; 
-?>
 
 <section class="hero-section">
     <h1>Our Laboratory Members & Team</h1>

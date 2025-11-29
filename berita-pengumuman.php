@@ -1,6 +1,7 @@
 
 <?php 
 include "config/database.php";
+include 'includes/header.php'; 
 
 $has_featured = false;
 $news_list = [];
@@ -74,29 +75,6 @@ try {
     <link rel="stylesheet" href="assets/css/style_profil.css">
 </head>
 <body>
-
-<header class="header-institusi">
-    <div class="logo-container">
-        <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
-        <div class="text-identitas">
-            <h3>Intelligent Vision and Smart System</h3>
-            <h2>POLITEKNIK NEGERI MALANG</h2>
-        </div>
-    </div>
-    <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
-</header>
-
-<nav class="navbar" id="main-navbar">
-        <ul>
-            <li class="active"><a href="index.php">Beranda</a></li>
-            
-            <li><a href="#">Riset dan Penelitian</a></li>
-            
-            <li><a href="member.php">Member</a></li> 
-
-            <li><a  class="active" href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
-        </ul>
-    </nav>
 
 <section class="hero-section">
     <h1>IVSS Laboratory News and Announcements</h1>

@@ -1,4 +1,4 @@
-/* Variabel Warna dan Gaya Dasar untuk Nuansa Elegan Modern */
+Variabel Warna dan Gaya Dasar untuk Nuansa Elegan Modern
 :root {
     --polinema-blue: #0D4C7C;    /* Biru Utama (Deep Corporate Blue) */
     --polinema-dark-gradient: #093A60; /* Biru Gelap untuk Gradasi */
@@ -156,7 +156,7 @@ a {
 /* 3. Hero Section (Banner) */
 .hero-section {
     background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
-                      url('../img/g4.png'); 
+                      url('g4.png'); 
     background-size: cover;
     background-position: center 40%; 
     height: 450px; 
@@ -360,7 +360,7 @@ a {
 /* =================================== */
 
 .info-section {
-    text-align: left; 
+    text-align: center; /* PERBAIKAN: Diubah dari 'left' agar judul .section-title rata tengah */
     margin-top: 40px;
     padding-top: 20px;
 }
@@ -370,7 +370,27 @@ a {
     color: var(--polinema-blue);
     font-size: 28px;
     font-weight: 700;
+    
+    /* --- PERBAIKAN UNTUK GARIS BAWAH GANDA DIMULAI --- */
     margin-bottom: 25px;
+    display: inline-block; /* PENTING: Untuk meratakan elemen dan mengaktifkan posisi relatif */
+    padding-bottom: 15px; /* Jarak antara teks dan garis */
+    position: relative; /* Dasar untuk posisi absolut ::after */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); 
+    /* --- PERBAIKAN UNTUK GARIS BAWAH GANDA SELESAI --- */
+}
+
+/* BARU: Pseudo-element untuk garis bawah kedua (Gaya Judul Beranda) */
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 5px; /* Posisi vertikal garis */
+    left: 50%; /* Mulai di tengah */
+    transform: translateX(-50%); /* Pindahkan ke kiri setengah lebarnya agar rata tengah */
+    width: 60%; /* Lebar garis bawah */
+    height: 4px;
+    background-color: var(--polinema-blue);
+    border-radius: 2px;
 }
 
 .grid-container {
@@ -768,13 +788,21 @@ a {
     flex-grow: 1;
 }
 
+/* --- PERBAIKAN: Judul Berita Utama (Menyesuaikan Gaya Judul Beranda) --- */
 .featured-news-content h4 {
+    /* MENGGUNAKAN GAYA JUDUL BERANDA (.content-area h3) */
     color: var(--polinema-blue);
-    font-size: 24px;
+    font-size: 30px; /* Diambil dari .content-area h3 */
+    font-weight: 800; /* Ditingkatkan untuk penekanan */
     margin-top: 0;
     margin-bottom: 10px;
-    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Diambil dari .content-area h3 */
+    /* Menambahkan garis aksen Merah yang tebal */
+    border-bottom: 4px solid var(--polinema-red); 
+    display: inline-block;
+    padding-bottom: 5px;
 }
+/* -------------------------------------------------------------------------- */
 
 .featured-news-content .date-meta {
     font-size: 14px;
@@ -830,12 +858,22 @@ a {
     padding: 20px;
 }
 
+/* --- PERBAIKAN: Judul Berita Grid (Menyesuaikan Gaya Judul Beranda) --- */
 .news-item-content h4 {
+    /* MENGGUNAKAN GAYA JUDUL BERANDA (.content-area h3) - Disesuaikan ukurannya */
     color: var(--polinema-blue);
-    font-size: 18px;
+    font-size: 20px; /* Disesuaikan agar proporsional di kartu grid */
+    font-weight: 700; /* Lebih tebal, mirip judul beranda */
     margin-top: 0;
-    font-weight: 600;
+    /* Tambahkan bayangan teks halus */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05); 
+    margin-bottom: 10px;
+    /* Menambahkan garis aksen Biru */
+    border-bottom: 2px solid var(--polinema-blue);
+    display: inline-block;
+    padding-bottom: 5px;
 }
+/* -------------------------------------------------------------------------- */
 
 .news-item-content .date-meta {
     font-size: 12px;
