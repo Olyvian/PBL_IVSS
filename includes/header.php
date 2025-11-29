@@ -91,7 +91,7 @@ if (isset($_SESSION['user_id'])) {
 
     <header class="header-institusi">
         <div class="logo-container">
-            <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
+            <img src="../assets/img/logo_polinema.png" alt="Logo POLINEMA">
             <div class="text-identitas">
                 <h3>Intelligent Vision and Smart Systems</h3>
                 <h2>POLITEKNIK NEGERI MALANG</h2>
