@@ -4,7 +4,7 @@ CREATE TABLE users (
   username VARCHAR(50) NOT NULL UNIQUE,
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role VARCHAR(20) NOT NULL DEFAULT 'viewer' CHECK (role IN ('viewer', 'admin_lab', 'admin_berita')),
+  role VARCHAR(20) NOT NULL DEFAULT 'viewer' CHECK (role IN ('viewer', 'admin_lab', 'admin_berita','member_lab')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -79,3 +79,10 @@ CREATE TABLE visi_misi (
     konten_id INT NOT NULL,
     deskripsi TEXT
 );
+CREATE TABLE dataset(
+    id SERIAL PRIMARY KEY,
+    nama_dataset VARCHAR(255) NOT NULL,
+    deskripsi TEXT,
+    url TEXT NOT NULL,
+    tanggal_ditambahkan TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
