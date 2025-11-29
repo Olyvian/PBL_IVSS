@@ -20,9 +20,12 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
+// Tentukan apakah pengguna adalah admin_lab (untuk Visi & Misi CRUD)
+$isAdminLab = ($_SESSION['role'] ?? '') === 'admin_lab'; 
+
 // 4. Logika Visi & Misi (CRUD TETAP DISINI)
 $visi_misi_to_edit = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_visimisi'])) {
+if ($isAdminLab && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_visimisi'])) {
     $is_update = isset($_POST['update_visimisi']);
     $visimisi_id = $is_update ? (int)$_POST['visimisi_id'] : null;
 
@@ -58,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_visimisi'])) {
 }
 
 // Delete Visi Misi
-if (isset($_GET['action']) && $_GET['action'] === 'delete_visimisi' && isset($_GET['id'])) {
+if ($isAdminLab && isset($_GET['action']) && $_GET['action'] === 'delete_visimisi' && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
     try {
         $stmt = $pdo->prepare("DELETE FROM visi_misi WHERE id = ?");
@@ -73,7 +76,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete_visimisi' && isset($_G
 
 // Edit Visi Misi
 $show_visimisi_form = false;
-if (isset($_GET['action']) && $_GET['action'] === 'edit_visimisi' && isset($_GET['id'])) {
+if ($isAdminLab && isset($_GET['action']) && $_GET['action'] === 'edit_visimisi' && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
     try {
         $stmt = $pdo->prepare("SELECT * FROM visi_misi WHERE id = ?");
@@ -185,48 +188,52 @@ include_once __DIR__ . '/../includes/sidebar.php';
         <div class="tabs">
             <span class="tab-item active">Visi & Misi</span>
         </div>
-        <button class="btn btn-primary" id="btnToggleVisiMisiForm">
-            <?php echo $show_visimisi_form ? 'Tutup Form' : 'Tambah Visi & Misi'; ?>
-        </button>
+        <?php if ($isAdminLab): // BATASI TOMBOL HANYA UNTUK admin_lab ?>
+            <button class="btn btn-primary" id="btnToggleVisiMisiForm">
+                <?php echo $show_visimisi_form ? 'Tutup Form' : 'Tambah Visi & Misi'; ?>
+            </button>
+        <?php endif; ?>
     </div>
 
-    <div class="form-container" id="visiMisiFormContainer" style="display: <?php echo $show_visimisi_form ? 'block' : 'none'; ?>;">
-        <h4 id="visiMisiFormTitle">
-            <?php echo $show_visimisi_form ? '✏️ Ubah Data Visi & Misi' : '➕ Tambah Visi & Misi Baru'; ?>
-        </h4>
-        
-        <form method="POST" action="dashboard.php">
-            <input type="hidden" name="form_visimisi" value="1">
-            <?php if ($show_visimisi_form): ?>
-                <input type="hidden" name="update_visimisi" value="1">
-                <input type="hidden" name="visimisi_id" value="<?= htmlspecialchars($visi_misi_to_edit['id']) ?>">
-            <?php endif; ?>
+    <?php if ($isAdminLab): // BATASI FORM HANYA UNTUK admin_lab ?>
+        <div class="form-container" id="visiMisiFormContainer" style="display: <?php echo $show_visimisi_form ? 'block' : 'none'; ?>;">
+            <h4 id="visiMisiFormTitle">
+                <?php echo $show_visimisi_form ? '✏️ Ubah Data Visi & Misi' : '➕ Tambah Visi & Misi Baru'; ?>
+            </h4>
             
-            <div class="form-group">
-                <label for="tipe_visimisi">Tipe:</label>
-                <select class="form-control" id="tipe_visimisi" name="tipe" required>
-                    <option value="visi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'visi') echo 'selected'; ?>>Visi</option>
-                    <option value="misi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'misi') echo 'selected'; ?>>Misi</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="konten_id_visimisi">Urutan:</label>
-                <input type="number" class="form-control" id="konten_id_visimisi" name="konten_id" min="1" 
-                    value="<?= htmlspecialchars($visi_misi_to_edit['konten_id'] ?? 1) ?>" required>
-            </div>
+            <form method="POST" action="dashboard.php">
+                <input type="hidden" name="form_visimisi" value="1">
+                <?php if ($show_visimisi_form): ?>
+                    <input type="hidden" name="update_visimisi" value="1">
+                    <input type="hidden" name="visimisi_id" value="<?= htmlspecialchars($visi_misi_to_edit['id']) ?>">
+                <?php endif; ?>
+                
+                <div class="form-group">
+                    <label for="tipe_visimisi">Tipe:</label>
+                    <select class="form-control" id="tipe_visimisi" name="tipe" required>
+                        <option value="visi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'visi') echo 'selected'; ?>>Visi</option>
+                        <option value="misi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'misi') echo 'selected'; ?>>Misi</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="konten_id_visimisi">Urutan:</label>
+                    <input type="number" class="form-control" id="konten_id_visimisi" name="konten_id" min="1" 
+                        value="<?= htmlspecialchars($visi_misi_to_edit['konten_id'] ?? 1) ?>" required>
+                </div>
 
-            <div class="form-group">
-                <label for="deskripsi_visimisi">Deskripsi/Poin:</label>
-                <textarea class="form-control" id="deskripsi_visimisi" name="deskripsi" rows="3" required><?= htmlspecialchars($visi_misi_to_edit['deskripsi'] ?? '') ?></textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary"><?php echo $show_visimisi_form ? 'Simpan Perubahan' : 'Simpan'; ?></button>
-                <button type="button" class="btn btn-secondary" id="btnCancelVisiMisi">Batal</button>
-            </div>
-        </form>
-    </div>
+                <div class="form-group">
+                    <label for="deskripsi_visimisi">Deskripsi/Poin:</label>
+                    <textarea class="form-control" id="deskripsi_visimisi" name="deskripsi" rows="3" required><?= htmlspecialchars($visi_misi_to_edit['deskripsi'] ?? '') ?></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary"><?php echo $show_visimisi_form ? 'Simpan Perubahan' : 'Simpan'; ?></button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelVisiMisi">Batal</button>
+                </div>
+            </form>
+        </div>
+    <?php endif; ?>
 
     <div class="card-body">
         <?php if (empty($visiMisiList)): ?>
@@ -239,7 +246,9 @@ include_once __DIR__ . '/../includes/sidebar.php';
                             <th class="table-tipe-col">Tipe</th>
                             <th class="table-date-col">Urutan</th>
                             <th>Deskripsi</th>
-                            <th class="table-aksi-col">Aksi</th>
+                            <?php if ($isAdminLab): // BATASI KOLOM AKSI ?>
+                                <th class="table-aksi-col">Aksi</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -252,15 +261,17 @@ include_once __DIR__ . '/../includes/sidebar.php';
                                 </td>
                                 <td class="table-date-col"><?= htmlspecialchars($vm['konten_id']) ?></td>
                                 <td><?= htmlspecialchars($vm['deskripsi']) ?></td>
-                                <td class="table-aksi-col">
-                                    <a href="dashboard.php?action=edit_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-edit" title="Ubah">
-                                        <i class="fa-solid fa-pencil"></i>
-                                    </a>
-                                    <a href="dashboard.php?action=delete_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-delete" title="Hapus" 
-                                        onclick="return confirm('Yakin hapus poin ini?')">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </a>
-                                </td>
+                                <?php if ($isAdminLab): // BATASI BUTTON AKSI ?>
+                                    <td class="table-aksi-col">
+                                        <a href="dashboard.php?action=edit_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-edit" title="Ubah">
+                                            <i class="fa-solid fa-pencil"></i>
+                                        </a>
+                                        <a href="dashboard.php?action=delete_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-delete" title="Hapus" 
+                                            onclick="return confirm('Yakin hapus poin ini?')">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </a>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -278,31 +289,37 @@ include_once __DIR__ . '/../includes/sidebar.php';
         const vmFormTitle = document.getElementById('visiMisiFormTitle');
 
         const isCurrentlyEditVM = <?php echo $show_visimisi_form ? 'true' : 'false'; ?>;
+        const isAdminLabUser = <?php echo $isAdminLab ? 'true' : 'false'; ?>; // Cek peran admin_lab
 
-        btnToggleVM.addEventListener('click', () => {
-            if (isCurrentlyEditVM) {
+        if (isAdminLabUser) { // Hanya aktifkan fungsionalitas form untuk admin_lab
+            btnToggleVM.addEventListener('click', () => {
+                if (isCurrentlyEditVM) {
+                    // Jika sedang mode edit, klik tombol akan me-reset ke tampilan default
+                    window.location.href = 'dashboard.php';
+                    return;
+                }
+                if (vmFormContainer.style.display === 'block') {
+                    vmFormContainer.style.display = 'none';
+                    btnToggleVM.innerText = 'Tambah Visi & Misi';
+                } else {
+                    vmFormContainer.style.display = 'block';
+                    btnToggleVM.innerText = 'Tutup Form';
+                    vmFormTitle.innerText = '➕ Tambah Visi & Misi Baru';
+                    vmFormContainer.scrollIntoView({ behavior: 'smooth' });
+                    vmFormContainer.querySelector('form').reset();
+                }
+            });
+
+            btnCancelVM.addEventListener('click', () => {
+                // Tombol batal selalu mengarah ke tampilan default
                 window.location.href = 'dashboard.php';
-                return;
-            }
-            if (vmFormContainer.style.display === 'block') {
-                vmFormContainer.style.display = 'none';
-                btnToggleVM.innerText = 'Tambah Visi & Misi';
-            } else {
+            });
+
+            <?php if (isset($error_message) && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_visimisi']) && isset($_POST['form_visimisi'])): ?>
+                // Tampilkan form jika ada error saat submit data baru
                 vmFormContainer.style.display = 'block';
                 btnToggleVM.innerText = 'Tutup Form';
-                vmFormTitle.innerText = '➕ Tambah Visi & Misi Baru';
-                vmFormContainer.scrollIntoView({ behavior: 'smooth' });
-                vmFormContainer.querySelector('form').reset();
-            }
-        });
-
-        btnCancelVM.addEventListener('click', () => {
-            window.location.href = 'dashboard.php';
-        });
-
-        <?php if (isset($error_message) && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_visimisi']) && isset($_POST['form_visimisi'])): ?>
-            vmFormContainer.style.display = 'block';
-            btnToggleVM.innerText = 'Tutup Form';
-        <?php endif; ?>
+            <?php endif; ?>
+        }
     });
 </script>
