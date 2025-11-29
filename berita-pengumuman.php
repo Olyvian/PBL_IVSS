@@ -25,7 +25,7 @@ try {
             'isi'  => substr(strip_tags($row_featured['isi']), 0, 250) . '...', 
             // Cek apakah ada gambar header
             'gambar'     => !empty($row_featured['gambar_header']) 
-                            ? 'uploads/news_images/' . $row_featured['gambar_header'] 
+                            ? 'uploads/news/' . $row_featured['gambar_header'] 
                             : 'assets/img/placeholder.png', 
             // Link menuju halaman detail membawa ID
             'link'       => 'detail_berita.php?id=' . $row_featured['id'] 
@@ -43,8 +43,8 @@ try {
                 'created_at' => $row['created_at'],
                 'isi'  => substr(strip_tags($row['isi']), 0, 150) . '...',
                 'gambar'     => !empty($row['gambar_header']) 
-                                ? '../uploads/news_images/' . $row['gambar_header'] 
-                                : '../assets/img/placeholder.png',
+                                ? 'uploads/news/' . $row['gambar_header'] 
+                                : 'assets/img/placeholder.png',
                 'link'       => 'detail_berita.php?id=' . $row['id']
             ];
         }

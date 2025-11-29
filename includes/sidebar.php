@@ -29,8 +29,8 @@ $role_name = $_SESSION['role'] ?? 'viewer';
 <body>
     <div class="sidebar-light">
         
-        <div class="sidebar-brand-light" style="text-align: center; padding: 20px 0;">
-            <img src="../assets/img/logo_ivss_tanpa_text.png" alt="Logo Lab IVSS" style="max-width: 100%; height: auto; max-height: 100px; object-fit: contain;">
+        <div class="sidebar-brand-light" style="text-align: center;">
+            <img src="../assets/img/logo_ivss_tanpa_text.png" alt="Logo Lab IVSS" style="width: 100%; height: 130px; object-fit: contain;">
         </div>
         <ul class="nav-menu-light">
             

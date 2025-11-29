@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($_FILES['gambar_header']['name'])) {
         $filename = uniqid() . '_' . basename($_FILES['gambar_header']['name']);
-        $uploadPath = __DIR__ . '/../uploads/news_images/' . $filename; // Pastikan folder ini ada
+        $uploadPath = __DIR__ . '/../uploads/news/' . $filename; // Pastikan folder ini ada
         if (move_uploaded_file($_FILES['gambar_header']['tmp_name'], $uploadPath)) {
             $gambar_header = $filename;
         }
@@ -65,7 +65,7 @@ if (isset($_GET['delete'])) {
     $stmt->execute([$id]);
     $old = $stmt->fetch();
     if ($old && $old['gambar_header']) {
-        $filePath = __DIR__ . "/../uploads/news_images/" . $old['gambar_header'];
+        $filePath = __DIR__ . "/../uploads/news/" . $old['gambar_header'];
         if (file_exists($filePath)) {
             unlink($filePath);
         }
@@ -166,7 +166,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <tr>
                     <td class="table-thumb-col">
                         <?php if (!empty($n['gambar_header'])): ?>
-                            <img src="../uploads/news_images/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
+                            <img src="../uploads/news/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
                         <?php else: ?>
                             <span class="table-thumbnail-placeholder">No image</span>
                         <?php endif; ?>

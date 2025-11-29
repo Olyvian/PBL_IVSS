@@ -69,7 +69,7 @@ CREATE TABLE fasilitas_peralatan (
     jenis VARCHAR(50) NOT NULL,            
     judul VARCHAR(255) NOT NULL,           
     deskripsi TEXT,
-    ikon_fa VARCHAR(255)                   
+    gambar VARCHAR(255) NULL                   
 );
 
 -- 8. Tabel Visi dan Misi

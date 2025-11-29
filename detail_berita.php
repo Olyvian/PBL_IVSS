@@ -150,13 +150,13 @@ try {
             <div class="detail-header">
                 <h1 class="detail-title"><?= htmlspecialchars($news['judul']) ?></h1>
                 <div class="detail-meta">
-                    <span>📅 Diposting pada <?= date("d F Y", strtotime($news['created_at'])) ?></span>
+                    <span>Diposting pada <?= date("d F Y", strtotime($news['created_at'])) ?></span>
                 </div>
             </div>
 
             <?php if (!empty($news['gambar_header'])): ?>
             <div class="detail-image-container">
-                <img src="uploads/news_images/<?= htmlspecialchars($news['gambar_header']) ?>" alt="Gambar Berita" class="detail-image">
+                <img src="uploads/news/<?= htmlspecialchars($news['gambar_header']) ?>" alt="Gambar Berita" class="detail-image">
             </div>
             <?php endif; ?>
 
@@ -165,7 +165,7 @@ try {
             </div>
 
             <div class="btn-back-container">
-                <a href="berita-pengumuman.php" class="btn-back">← Kembali ke Daftar Berita</a>
+                <a href="berita-pengumuman.php" style="color : var(--polinema-red); font-weight: 600">← Kembali ke Daftar Berita</a>
             </div>
 
         </div> 
