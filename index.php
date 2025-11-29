@@ -1,16 +1,20 @@
 <?php
 include 'config/database.php';
-include 'includes/header.php'; 
+// Pastikan path include header benar
+if (file_exists('includes/header.php')) {
+    include 'includes/header.php';
+}
 
+// 1. Ambil Data Visi
 try {
     $stmtVisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'visi' ORDER BY konten_id ASC LIMIT 1");
     $stmtVisi->execute();
-    
     $visi = $stmtVisi->fetchColumn() ?: "Visi belum tersedia di database."; 
 } catch (Exception $e) {
-    $visi = "Error mengambil visi: Data belum tersedia.";
+    $visi = "Error mengambil visi.";
 }
 
+// 2. Ambil Data Misi
 try {
     $stmtMisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'misi' ORDER BY konten_id ASC");
     $stmtMisi->execute();
@@ -18,16 +22,17 @@ try {
 } catch (Exception $e) {
     $misiList = [];
 }
+
+// 3. Ambil Data Fasilitas (UPDATE: Mengambil kolom 'gambar')
 try {
-    $stmtFasilitas = $pdo->prepare("SELECT judul, deskripsi, ikon_fa FROM fasilitas_peralatan ORDER BY id");
+    $stmtFasilitas = $pdo->prepare("SELECT judul, deskripsi, gambar FROM fasilitas_peralatan ORDER BY id");
     $stmtFasilitas->execute();
     $combinedList = $stmtFasilitas->fetchAll(PDO::FETCH_ASSOC);
-    
 } catch (Exception $e) {
     $combinedList = [];
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -36,6 +41,7 @@ try {
     <title>Laboratorium IVSS - POLINEMA</title>
     <link rel="stylesheet" href="assets/css/style_profil.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
 </head>
 <body>
 
@@ -53,8 +59,7 @@ try {
             <h3>Selamat Datang di Laboratorium IVSS</h3>
             <p>
                 Laboratorium Visi Cerdas dan Sistem Cerdas merupakan pusat riset dan pengembangan di bawah Jurusan Teknologi Informasi Politeknik Negeri Malang yang berfokus pada bidang intelligent vision, dan smart system. Laboratorium ini menjadi wadah bagi dosen dan mahasiswa untuk melakukan penelitian, pembelajaran, serta pelatihan dalam pengembangan sistem cerdas berbasis pengolahan citra dan kecerdasan buatan.
-
-Penelitian di laboratorium ini mengintegrasikan computer vision, AI, dan IoT untuk menciptakan solusi inovatif yang mampu mengenali, menganalisis, serta merespon lingkungan secara mandiri.
+                Penelitian di laboratorium ini mengintegrasikan computer vision, AI, dan IoT untuk menciptakan solusi inovatif yang mampu mengenali, menganalisis, serta merespon lingkungan secara mandiri.
             </p>
         </div>
 
@@ -79,27 +84,36 @@ Penelitian di laboratorium ini mengintegrasikan computer vision, AI, dan IoT unt
         </section>
 
         <section class="info-section">
-            <h3 class="section-title">Fasilitas & Peralatan Laboratorium IVIS</h3>
+            <h3 class="section-title">Fasilitas & Peralatan Laboratorium IVSS</h3>
 
             <div class="grid-container">
                 
                 <?php if (count($combinedList) > 0): ?>
                     <?php foreach ($combinedList as $item): ?>
                         <div class="info-card">
-                            <i class="<?= htmlspecialchars($item['ikon_fa'] ?? 'fa-solid fa-circle-info') ?> card-icon"></i>
+                            <?php 
+                                // Cek apakah ada gambar, jika tidak pakai placeholder
+                                $imgSrc = !empty($item['gambar']) 
+                                          ? 'uploads/fasilitas/' . $item['gambar'] 
+                                          : 'assets/img/placeholder_fasilitas.png'; // Pastikan ada gambar default
+                            ?>
+                            
+                            <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($item['judul']) ?>" class="fasilitas-img">
+                            
                             <h4 class="card-title"><?= htmlspecialchars($item['judul']) ?></h4>
                             <p><?= htmlspecialchars($item['deskripsi']) ?></p>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-dark);">
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-dark); padding: 20px;">
                         Data Fasilitas dan Peralatan belum tersedia di database.
                     </div>
                 <?php endif; ?>
                 
             </div>
         </section>
-        </main>
+        
+    </main>
 
     <footer class="footer-polinema">
         <div class="footer-top">
