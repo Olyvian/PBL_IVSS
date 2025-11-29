@@ -60,6 +60,13 @@ $role_name = $_SESSION['role'] ?? 'viewer';
                 </a>
             </li>
             <li>
+                <a href="dashboard_fasilitas.php" 
+                   class="nav-link-light <?php echo ($activePage === 'fasilitas') ? 'active' : ''; ?>">
+                    <i class="bi bi-tools"></i>
+                    <span>Fasilitas</span>
+                </a>
+            </li>
+            <li>
                 <a href="dashboard_pendaftaran.php" 
                    class="nav-link-light <?php echo ($activePage === 'pendaftaran') ? 'active' : ''; ?>">
                     <i class="bi bi-person-check"></i>
