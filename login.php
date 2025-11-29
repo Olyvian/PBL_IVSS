@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id'])) {
     if ($role === 'admin_lab' || $role === 'admin_berita') {
         header("Location:pages/dashboard.php");
     } else {
-        header("Location: beranda.php");
+        header("Location: index.php");
     }
     exit;
 }
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header("Location: pages/dashboard.php");
             } else {
                 // Default redirect (mencakup 'viewer' dan role lainnya)
-                header("Location: beranda.php");
+                header("Location: index.php");
             }
             exit; // Penting untuk menghentikan eksekusi setelah header
 

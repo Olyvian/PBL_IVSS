@@ -7,6 +7,6 @@ include 'pdo.php';
 $_SESSION = array();
 session_destroy();
 
-header("Location: login.php");
+header("Location: beranda.php");
 exit;
 ?>

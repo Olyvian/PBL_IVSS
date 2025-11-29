@@ -2,7 +2,7 @@
     <div class="footer-top">
         <div class="footer-identitas">
             <div class="logo-container-footer">
-                <img src="../assets/img/logo_polinema.png" alt="Logo POLINEMA">
+                <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
                 <div class="text-identitas-footer">
                     <h3>JURUSAN TEKNOLOGI INFORMASI</h3>
                     <h2>POLITEKNIK NEGERI MALANG</h2>
@@ -15,8 +15,8 @@
         </div>
 
         <div class="social-media">
-            <a href="#"><img src="../assets/img/yt.png" alt="YouTube"></a>
-            <a href="#"><img src="../assets/img/ig.jpeg" alt="Instagram"></a>
+            <a href="#"><img src="assets/img/yt.png" alt="YouTube"></a>
+            <a href="#"><img src="assets/img/ig.jpeg" alt="Instagram"></a>
         </div>
     </div>
     

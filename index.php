@@ -1,44 +1,29 @@
-
 <?php
-// Hubungkan ke database PostgreSQL via PDO
-// Pastikan file db_config.php sudah tersedia dan berisi koneksi PDO
 include 'config/database.php';
 include 'includes/header.php'; 
 
-// ================== LOAD DATA DARI DATABASE ===================
-
-// VISI
 try {
-    // Ambil baris dengan tipe 'Visi'
-    $stmtVisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'Visi' LIMIT 1");
+    $stmtVisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'visi' ORDER BY konten_id ASC LIMIT 1");
     $stmtVisi->execute();
-    $visiRow = $stmtVisi->fetch(PDO::FETCH_ASSOC);
-    // Tambahkan filter 'Visi' agar lebih spesifik
-    $visi = $visiRow ? $visiRow['deskripsi'] : "Visi belum tersedia di database."; 
+    
+    $visi = $stmtVisi->fetchColumn() ?: "Visi belum tersedia di database."; 
 } catch (Exception $e) {
-    // Pesan error aman, tapi di sini tetap menampilkan pesan error asli untuk debugging sementara
-    $visi = "Error mengambil visi: " . $e->getMessage();
+    $visi = "Error mengambil visi: Data belum tersedia.";
 }
 
-// MISI
 try {
-    // Ambil baris dengan tipe 'Misi'
-    $stmtMisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'Misi' ORDER BY id");
+    $stmtMisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'misi' ORDER BY konten_id ASC");
     $stmtMisi->execute();
     $misiList = $stmtMisi->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     $misiList = [];
 }
-
-// ================== FASILITAS & PERALATAN (DINAMIS) ===================
-// Logika untuk mengambil data Fasilitas & Peralatan dari tabel 'fasilitas_peralatan'
 try {
     $stmtFasilitas = $pdo->prepare("SELECT judul, deskripsi, ikon_fa FROM fasilitas_peralatan ORDER BY id");
     $stmtFasilitas->execute();
     $combinedList = $stmtFasilitas->fetchAll(PDO::FETCH_ASSOC);
     
 } catch (Exception $e) {
-    // Jika ada error database (seperti tabel tidak ditemukan), $combinedList akan kosong
     $combinedList = [];
 }
 

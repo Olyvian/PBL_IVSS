@@ -42,7 +42,7 @@ if (isset($_SESSION['user_id'])) {
             align-items: center;
         }
         .user-greeting {
-            color: #fff; 
+            color: #fff; /* Diubah menjadi putih sesuai permintaan */
             margin-right: 15px;
             font-size: 0.9rem;
         }
@@ -80,6 +80,37 @@ if (isset($_SESSION['user_id'])) {
         .navbar li.has-dropdown > a {
             padding-right: 20px;
         }
+
+        /* --- Bagian CSS Tambahan untuk Tombol Login/Logout Estetik --- */
+        .logout-container a {
+            padding: 8px 15px;
+            border-radius: 5px; /* Sudut sedikit membulat */
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        /* Style untuk Tombol Logout (Warna Merah Kontras) */
+        .logout-container .btn-danger {
+            background-color: #dc3545; /* Merah cerah */
+            border: 1px solid #dc3545;
+        }
+        .logout-container .btn-danger:hover {
+            background-color: #c82333; /* Merah sedikit lebih gelap saat hover */
+            border-color: #bd2130;
+        }
+        
+        /* Style untuk Tombol Login (Warna Primary Biru Kontras) */
+        .logout-container .service-btn.btn-filled {
+            color: #fff; /* Teks putih */
+            background-color: #007bff; /* Biru Primary */
+            border: 1px solid #007bff;
+        }
+        .logout-container .service-btn.btn-filled:hover {
+            background-color: #0056b3; /* Biru sedikit lebih gelap saat hover */
+            border-color: #004085;
+        }
         
         /* CSS Umum Tambahan */
         .main-content {
@@ -91,7 +122,7 @@ if (isset($_SESSION['user_id'])) {
 
     <header class="header-institusi">
         <div class="logo-container">
-            <img src="../assets/img/logo_polinema.png" alt="Logo POLINEMA">
+            <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
             <div class="text-identitas">
                 <h3>Intelligent Vision and Smart Systems</h3>
                 <h2>POLITEKNIK NEGERI MALANG</h2>
