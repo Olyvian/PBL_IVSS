@@ -46,7 +46,7 @@ try {
     <main class="main-content">
 
         <div class="logo-lab">
-            <img src="assets/img/Logo-lab-IVSS-300x118.png" alt="Logo Laboratorium IVSS"> 
+            <img src="assets/img/logo_ivss_tanpa_text.png" alt="Logo Laboratorium IVSS"> 
         </div>
 
         <div class="content-area">
