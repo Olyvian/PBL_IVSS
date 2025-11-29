@@ -198,7 +198,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
     <?php if ($isAdminLab): // BATASI FORM HANYA UNTUK admin_lab ?>
         <div class="form-container" id="visiMisiFormContainer" style="display: <?php echo $show_visimisi_form ? 'block' : 'none'; ?>;">
             <h4 id="visiMisiFormTitle">
-                <?php echo $show_visimisi_form ? '✏️ Ubah Data Visi & Misi' : '➕ Tambah Visi & Misi Baru'; ?>
+                <?php echo $show_visimisi_form ? ' Ubah Data Visi & Misi' : ' Tambah Visi & Misi Baru'; ?>
             </h4>
             
             <form method="POST" action="dashboard.php">
@@ -304,7 +304,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 } else {
                     vmFormContainer.style.display = 'block';
                     btnToggleVM.innerText = 'Tutup Form';
-                    vmFormTitle.innerText = '➕ Tambah Visi & Misi Baru';
+                    vmFormTitle.innerText = ' Tambah Visi & Misi Baru';
                     vmFormContainer.scrollIntoView({ behavior: 'smooth' });
                     vmFormContainer.querySelector('form').reset();
                 }

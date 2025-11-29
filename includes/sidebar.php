@@ -85,6 +85,15 @@ $role_name = $_SESSION['role'] ?? 'viewer';
             </li>
             <?php endif; ?>
 
+            <?php if ($role_name === 'admin_lab' || $role_name === 'member_lab'): ?>
+            <li>
+                <a href="dashboard_dataset.php" 
+                   class="nav-link-light <?php echo ($activePage === 'dataset') ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-database"></i> <span>Dataset</span>
+                </a>
+            </li>
+            <?php endif; ?>
+
             </ul>
         <div class="sidebar-footer-light">
             <a href="../logout.php" class="nav-link-light logout">
