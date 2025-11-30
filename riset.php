@@ -1,5 +1,6 @@
 <?php
 include 'config/database.php';
+include 'includes/header.php'; 
 
 // Ambil semua data riset menggunakan PDO
 $sql = "SELECT * FROM riset ORDER BY tanggal_mulai DESC";
@@ -73,27 +74,11 @@ $riset = $stmt->fetchAll();
     </style>
 </head>
 
+<section class="hero-section">
+    <h1>IVSS Laboratory Research and Innovations</h1>
+</section>
+
 <body>
-
-<header class="header-institusi">
-    <div class="logo-container">
-        <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
-        <div class="text-identitas">
-            <h3>Intelligent Vision and Smart System</h3>
-            <h2>POLITEKNIK NEGERI MALANG</h2>
-        </div>
-    </div>
-    <button class="menu-toggle" aria-label="Toggle navigation">&#9776;</button>
-</header>
-
-<nav class="navbar" id="main-navbar">
-    <ul>
-        <li><a href="index.php">Beranda</a></li>
-        <li class="active"><a href="riset.php">Riset dan Penelitian</a></li>
-        <li><a href="#">Member</a></li>
-        <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
-    </ul>
-</nav>
 
 <!-- ===================== MAIN CONTENT (DAFTAR RISET) ===================== -->
 
@@ -127,48 +112,10 @@ $riset = $stmt->fetchAll();
     </div>
 </main>
 
-<!-- ===================== FOOTER ===================== -->
-
-<footer class="footer-polinema">
-    <div class="footer-top">
-        <div class="footer-identitas">
-            <div class="logo-container-footer">
-                <img src="assets/img/logo_polinema.png" alt="Logo POLINEMA">
-                <div class="text-identitas-footer">
-                    <h3>JURUSAN TEKNOLOGI INFORMASI</h3>
-                    <h2>POLITEKNIK NEGERI MALANG</h2>
-                    <h3>Jl. Soekarno Hatta No.9, Lowokwaru, Kota Malang</h3>
-                </div>
-            </div>
-        </div>
-        <div class="social-media">
-            <a href="#"><img src="yt.png" alt="YouTube Icon"></a>
-            <a href="#"><img src="ig.jpeg" alt="Instagram Icon"></a>
-        </div>
-    </div>
-
-    <div class="footer-bottom-menu">
-        <div class="menu-group">
-            <h4>Tentang JTI</h4>
-            <ul>
-                <li><a href="#">Sejarah</a></li>
-                <li><a href="#">Visi, Misi & Tujuan</a></li>
-                <li><a href="#">Struktur Organisasi</a></li>
-                <li><a href="#">Tenaga Pengajar</a></li>
-                <li><a href="#">Tenaga Kependidikan</a></li>
-                <li><a href="#">Sarana & Prasarana</a></li>
-            </ul>
-        </div>
-
-        <div class="menu-group">
-            <h4>Website Polinema Lainnya</h4>
-            <ul>
-                <li><a href="http://polinema.ac.id">Polinema.ac.id</a></li>
-            </ul>
-        </div>
-    </div>
-</footer>
-
 <script src="script.js"></script>
 </body>
 </html>
+
+<?php
+include 'includes/footer.php'; 
+?>

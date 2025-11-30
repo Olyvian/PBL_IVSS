@@ -146,7 +146,7 @@ if (isset($_SESSION['user_id'])) {
         <ul>
             <li class="active"><a href="index.php">Beranda</a></li>
             
-            <li><a href="#">Riset dan Penelitian</a></li>
+            <li><a href="riset.php">Riset dan Penelitian</a></li>
             
             <li><a href="member.php">Member</a></li> 
 
