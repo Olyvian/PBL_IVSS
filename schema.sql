@@ -1,3 +1,4 @@
+
 -- 1. Tabel Users
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
