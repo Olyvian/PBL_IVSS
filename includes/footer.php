@@ -252,6 +252,7 @@
             <ul class="footer-links">
                 <li><a href="index.php">Beranda</a></li>
                 <li><a href="riset.php">Riset & Penelitian</a></li>
+                <li><a href="riset.php">Produk & Inovasi</a></li>
                 <li><a href="member.php">Anggota Lab (Member)</a></li>
                 <li><a href="berita-pengumuman.php">Berita & Pengumuman</a></li>
             </ul>
