@@ -87,3 +87,11 @@ CREATE TABLE dataset(
     url TEXT NOT NULL,
     tanggal_ditambahkan TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
+-- 9. Tabel Produk (Inovasi Lab)
+CREATE TABLE produk (
+    id SERIAL PRIMARY KEY,
+    nama_produk VARCHAR(255) NOT NULL,
+    deskripsi TEXT,
+    gambar VARCHAR(255) NULL,
+    tanggal_dibuat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
