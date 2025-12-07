@@ -27,7 +27,7 @@ CREATE TABLE berita (
   judul VARCHAR(255) NOT NULL,
   isi TEXT NOT NULL,
   gambar_header VARCHAR(255) NULL,
-  tipe VARCHAR(20) NOT NULL DEFAULT 'berita' CHECK (tipe IN ('berita', 'pengumuman')),
+  tipe VARCHAR(20) NOT NULL DEFAULT 'berita' CHECK (tipe IN ('berita', 'pengumuman', 'pelatihan')),
   author_id INT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users(id)

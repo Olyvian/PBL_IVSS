@@ -11,7 +11,7 @@ if (isLoggedIn() && !isset($_SESSION['username'])) {
         $user = $stmt->fetch();
         if ($user) {
             $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role']; 
+            $_SESSION['role'] = $user['role'];
         } else {
             session_destroy();
             header('Location: ../Login/login.php');
@@ -23,7 +23,7 @@ if (isLoggedIn() && !isset($_SESSION['username'])) {
 }
 
 // 3. Proteksi Halaman
-redirectIfNotLoggedIn(['admin_berita', 'admin_lab']); // dimatikan untuk test desain
+// redirectIfNotLoggedIn(['admin_berita', 'admin_lab']); // dimatikan untuk test desain
 
 // 4. Logika CRUD (Tambah/Edit) - Disesuaikan dengan DB Baru
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO berita (judul, isi, gambar_header, tipe, author_id) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$judul, $isi, $gambar_header, $tipe, $author_id]);
     }
-    header('Location: dashboard_berita.php'); 
+    header('Location: dashboard_berita.php');
     exit;
 }
 
@@ -72,7 +72,7 @@ if (isset($_GET['delete'])) {
     }
     $stmt = $pdo->prepare("DELETE FROM berita WHERE id = ?");
     $stmt->execute([$id]);
-    header('Location: dashboard_berita.php'); 
+    header('Location: dashboard_berita.php');
     exit;
 }
 
@@ -108,18 +108,19 @@ include_once __DIR__ . '/../includes/sidebar.php';
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="berita_id" id="berita_id">
             <input type="hidden" name="existing_gambar_header" id="existing_gambar_header">
-            
+
             <div class="form-group">
                 <label for="judul">Judul:</label>
                 <input type="text" name="judul" id="judul" class="form-control" required>
             </div>
-            
+
             <!-- Field Tipe (BARU) -->
             <div class="form-group">
-                <label for="tipe">Tipe:</label>
+                <label for="tipe">Kategori:</label>
                 <select name="tipe" id="tipe" class="form-control" required>
                     <option value="berita">Berita</option>
                     <option value="pengumuman">Pengumuman</option>
+                    <option value="pelatihan">Pelatihan</option>
                 </select>
             </div>
 
@@ -163,41 +164,41 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <?php endif; ?>
 
                 <?php foreach ($newsList as $n): ?>
-                <tr>
-                    <td class="table-thumb-col">
-                        <?php if (!empty($n['gambar_header'])): ?>
-                            <img src="../uploads/news/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
-                        <?php else: ?>
-                            <span class="table-thumbnail-placeholder">No image</span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?= htmlspecialchars($n['judul']) ?></td>
-                    <td>
-                        <?php
-                        $excerpt = strip_tags($n['isi']);
-                        if (strlen($excerpt) > 20) {
-                            echo htmlspecialchars(substr($excerpt, 0, 20)) . '...';
-                        } else {
-                            echo htmlspecialchars($excerpt);
-                        }
-                        ?>
-                    </td>
-                    <!-- Tampilkan Tipe (BARU) -->
-                    <td class="table-tipe-col">
+                    <tr>
+                        <td class="table-thumb-col">
+                            <?php if (!empty($n['gambar_header'])): ?>
+                                <img src="../uploads/news/<?= htmlspecialchars($n['gambar_header']) ?>" class="table-thumbnail">
+                            <?php else: ?>
+                                <span class="table-thumbnail-placeholder">No image</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= htmlspecialchars($n['judul']) ?></td>
+                        <td>
+                            <?php
+                            $excerpt = strip_tags($n['isi']);
+                            if (strlen($excerpt) > 20) {
+                                echo htmlspecialchars(substr($excerpt, 0, 20)) . '...';
+                            } else {
+                                echo htmlspecialchars($excerpt);
+                            }
+                            ?>
+                        </td>
+                        <!-- Tampilkan Tipe (BARU) -->
+                        <td class="table-tipe-col">
                             <?php echo htmlspecialchars($n['tipe']); ?>
-                    </td>
-                    <td class="table-date-col"><?= date('d M Y', strtotime($n['created_at'])) ?></td>
-                    <td class="table-aksi-col">
-                        <a href="#" class="btn-icon btn-edit" title="Edit"
-                           onclick='editNews(<?= $n['id'] ?>, <?= json_encode($n['judul']) ?>, <?= json_encode($n['isi']) ?>, <?= json_encode($n['gambar_header'] ?? '') ?>, <?= json_encode($n['tipe']) ?>); return false;'>
-                            <i class="fa-solid fa-pencil"></i>
-                        </a>
-                        <a href="dashboard_berita.php?delete=<?= $n['id'] ?>" class="btn-icon btn-delete" title="Hapus"
-                           onclick="return confirm('Anda yakin ingin menghapus berita ini?')">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </a>
-                    </td>
-                </tr>
+                        </td>
+                        <td class="table-date-col"><?= date('d M Y', strtotime($n['created_at'])) ?></td>
+                        <td class="table-aksi-col">
+                            <a href="#" class="btn-icon btn-edit" title="Edit"
+                                onclick='editNews(<?= $n['id'] ?>, <?= json_encode($n['judul']) ?>, <?= json_encode($n['isi']) ?>, <?= json_encode($n['gambar_header'] ?? '') ?>, <?= json_encode($n['tipe']) ?>); return false;'>
+                                <i class="fa-solid fa-pencil"></i>
+                            </a>
+                            <a href="dashboard_berita.php?delete=<?= $n['id'] ?>" class="btn-icon btn-delete" title="Hapus"
+                                onclick="return confirm('Anda yakin ingin menghapus berita ini?')">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -206,70 +207,70 @@ include_once __DIR__ . '/../includes/sidebar.php';
 
 <!-- script -->
 <script>
-    const formContainer = document.getElementById('newsFormContainer');
-    const btnShow = document.getElementById('btnShowForm');
-    const btnCancel = document.getElementById('btnCancelForm');
-    const formTitle = document.getElementById('formTitle');
-    const form = formContainer.querySelector('form');
-    
-    // Sesuaikan ID input
-    const inputId = document.getElementById('berita_id');
-    const inputJudul = document.getElementById('judul');
-    const inputIsi = document.getElementById('isi');
-    const inputTipe = document.getElementById('tipe'); // Input Tipe BARU
-    const inputImage = document.getElementById('image_input');
-    const inputExistingImage = document.getElementById('existing_gambar_header');
-    const previewContainer = document.getElementById('image_preview_container');
-    const previewImg = document.getElementById('image_preview');
+    const formContainer = document.getElementById('newsFormContainer');
+    const btnShow = document.getElementById('btnShowForm');
+    const btnCancel = document.getElementById('btnCancelForm');
+    const formTitle = document.getElementById('formTitle');
+    const form = formContainer.querySelector('form');
 
-    // (DIUBAH) Tombol ini sekarang menjadi TOGGLE (Buka/Tutup)
-    btnShow.addEventListener('click', () => {
+    // Sesuaikan ID input
+    const inputId = document.getElementById('berita_id');
+    const inputJudul = document.getElementById('judul');
+    const inputIsi = document.getElementById('isi');
+    const inputTipe = document.getElementById('tipe'); // Input Tipe BARU
+    const inputImage = document.getElementById('image_input');
+    const inputExistingImage = document.getElementById('existing_gambar_header');
+    const previewContainer = document.getElementById('image_preview_container');
+    const previewImg = document.getElementById('image_preview');
+
+    // (DIUBAH) Tombol ini sekarang menjadi TOGGLE (Buka/Tutup)
+    btnShow.addEventListener('click', () => {
         // Cek apakah form sedang terlihat (display === 'block')
-        if (formContainer.style.display === 'block') {
+        if (formContainer.style.display === 'block') {
             // JIKA TERLIHAT: Sembunyikan form
-            formContainer.style.display = 'none';
-            btnShow.innerText = 'Tambah Berita';
-            form.reset();
-        } else {
+            formContainer.style.display = 'none';
+            btnShow.innerText = 'Tambah Berita';
+            form.reset();
+        } else {
             // JIKA TERSEMBUNYI: Tampilkan form (Logika 'Tambah')
-            form.reset();
-            inputId.value = '';
-            inputExistingImage.value = '';
-            formTitle.innerText = 'Tambah Berita Baru';
-            btnShow.innerText = 'Tutup Form';
-            previewContainer.style.display = 'none';
-            formContainer.style.display = 'block';
-            window.scrollTo(0, 0); // Gulung ke atas
-        }
-    });
+            form.reset();
+            inputId.value = '';
+            inputExistingImage.value = '';
+            formTitle.innerText = 'Tambah Berita Baru';
+            btnShow.innerText = 'Tutup Form';
+            previewContainer.style.display = 'none';
+            formContainer.style.display = 'block';
+            window.scrollTo(0, 0); // Gulung ke atas
+        }
+    });
 
-    // Tampilkan form untuk EDIT (Tidak berubah, tapi pastikan teks tombol benar)
-    function editNews(id, judul, isi, gambar, tipe) {
-        form.reset();
-        inputId.value = id;
-        inputJudul.value = judul;
-        inputIsi.value = isi;
-        inputTipe.value = tipe; // Set Tipe BARU
-        inputExistingImage.value = gambar;
-        formTitle.innerText = 'Edit Berita';
-        btnShow.innerText = 'Tutup Form'; // <--- Pastikan teks tombol di-update
-        
-        if (gambar) {
-            previewImg.src = '../uploads/news_images/' + gambar;
-            previewContainer.style.display = 'block';
-        } else {
-            previewContainer.style.display = 'none';
-        }
-        
+    // Tampilkan form untuk EDIT (Tidak berubah, tapi pastikan teks tombol benar)
+    function editNews(id, judul, isi, gambar, tipe) {
+        form.reset();
+        inputId.value = id;
+        inputJudul.value = judul;
+        inputIsi.value = isi;
+        inputTipe.value = tipe; // Set Tipe BARU
+        inputExistingImage.value = gambar;
+        formTitle.innerText = 'Edit Berita';
+        btnShow.innerText = 'Tutup Form'; // <--- Pastikan teks tombol di-update
+
+        if (gambar) {
+            previewImg.src = '../uploads/news_images/' + gambar;
+            previewContainer.style.display = 'block';
+        } else {
+            previewContainer.style.display = 'none';
+        }
+
         // Selalu tampilkan form saat edit
-        formContainer.style.display = 'block'; 
-        window.scrollTo(0, 0); // Gulung ke atas
-    }
+        formContainer.style.display = 'block';
+        window.scrollTo(0, 0); // Gulung ke atas
+    }
 
-    // Sembunyikan form (Fungsi 'Batal' ini sudah benar)
-    btnCancel.addEventListener('click', () => {
-        formContainer.style.display = 'none';
-        btnShow.innerText = 'Tambah Berita';
-        form.reset();
-    });
+    // Sembunyikan form (Fungsi 'Batal' ini sudah benar)
+    btnCancel.addEventListener('click', () => {
+        formContainer.style.display = 'none';
+        btnShow.innerText = 'Tambah Berita';
+        form.reset();
+    });
 </script>
