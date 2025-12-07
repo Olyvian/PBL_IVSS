@@ -26,6 +26,7 @@ if (isset($_SESSION['user_id'])) {
     
     <link rel="stylesheet" href="assets/css/style_profil.css"> 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <style>
         /* --- Bagian CSS Navbar & Header (Diambil dari beranda.php agar konsisten) --- */
@@ -95,6 +96,7 @@ if (isset($_SESSION['user_id'])) {
         .logout-container .btn-danger {
             background-color: #dc3545; /* Merah cerah */
             border: 1px solid #dc3545;
+            color: white;
         }
         .logout-container .btn-danger:hover {
             background-color: #c82333; /* Merah sedikit lebih gelap saat hover */
@@ -144,11 +146,13 @@ if (isset($_SESSION['user_id'])) {
 
     <nav class="navbar" id="main-navbar">
         <ul>
-            <li class="active"><a href="index.php">Beranda</a></li>
+            <li><a href="index.php">Beranda</a></li>
             
             <li><a href="riset.php">Riset dan Penelitian</a></li>
             
             <li><a href="member.php">Member</a></li> 
+
+            <li><a href="produk.php">Produk</a></li> 
 
             <li><a href="berita-pengumuman.php">Berita dan Pengumuman</a></li>
         </ul>
