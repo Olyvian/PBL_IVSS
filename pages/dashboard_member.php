@@ -9,11 +9,14 @@ $activePage = 'member';
 
 // --- 1. LOGIKA SIMPAN DATA (TAMBAH & EDIT) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama_lengkap = $_POST['nama_lengkap'];
-    $bio = $_POST['bio'];
-    $posisi = $_POST['posisi'];
+    $nama_lengkap  = $_POST['nama_lengkap'];
+    $bio           = $_POST['bio'];
+    $posisi        = $_POST['posisi'];
     
-    // PERBAIKAN UTAMA: Paksa jadi huruf kecil agar lolos check constraint database
+    // TAMBAHAN: Ambil data nomor telepon
+    $nomor_telepon = $_POST['nomor_telepon']; 
+
+    // Paksa jadi huruf kecil agar lolos check constraint database
     $status = strtolower($_POST['status']); 
     
     $foto_profil = null;
@@ -42,13 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $foto_profil = $_POST['existing_foto_profil'] ?? null;
         }
 
-        $stmt = $pdo->prepare("UPDATE anggota_lab SET nama_lengkap=?, bio=?, posisi=?, status=?, foto_profil=? WHERE id=?");
-        $stmt->execute([$nama_lengkap, $bio, $posisi, $status, $foto_profil, $id]);
+        // TAMBAHAN: Update query termasuk nomor_telepon
+        $stmt = $pdo->prepare("UPDATE anggota_lab SET nama_lengkap=?, bio=?, posisi=?, nomor_telepon=?, status=?, foto_profil=? WHERE id=?");
+        $stmt->execute([$nama_lengkap, $bio, $posisi, $nomor_telepon, $status, $foto_profil, $id]);
 
     } else {
         // --- Mode TAMBAH ---
-        $stmt = $pdo->prepare("INSERT INTO anggota_lab (nama_lengkap, bio, posisi, status, foto_profil) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$nama_lengkap, $bio, $posisi, $status, $foto_profil]);
+        // TAMBAHAN: Insert query termasuk nomor_telepon
+        $stmt = $pdo->prepare("INSERT INTO anggota_lab (nama_lengkap, bio, posisi, nomor_telepon, status, foto_profil) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$nama_lengkap, $bio, $posisi, $nomor_telepon, $status, $foto_profil]);
     }
     
     header('Location: dashboard_member.php'); 
@@ -112,6 +117,11 @@ include_once __DIR__ . '/../includes/sidebar.php';
             </div>
 
             <div class="form-group">
+                <label for="nomor_telepon">Nomor Telepon / WhatsApp:</label>
+                <input type="text" name="nomor_telepon" id="nomor_telepon" class="form-control" placeholder="Contoh: 08123456789">
+            </div>
+
+            <div class="form-group">
                 <label for="status">Status Keanggotaan:</label>
                 <select name="status" id="status" class="form-control" required>
                     <option value="aktif">Aktif</option>
@@ -148,13 +158,13 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     <th>Nama Lengkap</th>
                     <th>Status</th>
                     <th>Posisi</th>
-                    <th>Bio</th>
+                    <th>No. Telp</th> <th>Bio</th>
                     <th class="table-aksi-col">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($list)): ?>
-                    <tr><td colspan="6" class="empty-table">Belum ada anggota lab yang terdaftar.</td></tr>
+                    <tr><td colspan="7" class="empty-table">Belum ada anggota lab yang terdaftar.</td></tr>
                 <?php endif; ?>
 
                 <?php foreach ($list as $n): ?>
@@ -171,13 +181,15 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     
                     <td>
                         <?php if (strtolower($n['status']) == 'aktif'): ?>
-                            <span>Aktif</span>
+                            <span class="badge bg-success">Aktif</span>
                         <?php else: ?>
-                            <span>Alumni</span>
+                            <span class="badge bg-secondary">Alumni</span>
                         <?php endif; ?>
                     </td>
 
                     <td><?= htmlspecialchars($n['posisi']) ?></td>
+
+                    <td><?= htmlspecialchars($n['nomor_telepon'] ?? '-') ?></td>
 
                     <td style="font-size: 0.9rem; color: #666;">
                         <?php
@@ -193,6 +205,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                                <?= json_encode($n['nama_lengkap']) ?>, 
                                <?= json_encode($n['bio']) ?>, 
                                <?= json_encode($n['posisi']) ?>, 
+                               <?= json_encode($n['nomor_telepon'] ?? '') ?>, 
                                <?= json_encode(strtolower($n['status'])) ?>, 
                                <?= json_encode($n['foto_profil'] ?? '') ?>
                            ); return false;'>
@@ -222,6 +235,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
     const inputId = document.getElementById('member_id');
     const inputNama = document.getElementById('nama_lengkap');
     const inputPosisi = document.getElementById('posisi');
+    const inputNoTelp = document.getElementById('nomor_telepon'); // TAMBAHAN
     const inputStatus = document.getElementById('status');
     const inputBio = document.getElementById('bio');
     const inputExistingFoto = document.getElementById('existing_foto_profil');
@@ -233,23 +247,20 @@ include_once __DIR__ . '/../includes/sidebar.php';
 
     // --- FUNGSI 1: TAMPILKAN FORM TAMBAH ---
     btnShow.addEventListener('click', () => {
-        form.reset(); // Kosongkan form
+        form.reset(); 
         inputId.value = '';
         inputExistingFoto.value = '';
+        inputNoTelp.value = ''; // Reset no telp
         
-        // Default status ke Aktif
         if(inputStatus) inputStatus.value = 'aktif';
 
-        // UI Reset
         formTitle.innerText = 'Tambah Anggota Baru';
         previewContainer.style.display = 'none';
         
-        // Tampilkan Form
         formContainer.style.display = 'block';
         btnCancel.style.display = 'inline-block';
         btnShow.style.display = 'none';
         
-        // Animasi Scroll ke atas
         formContainer.scrollIntoView({ behavior: 'smooth' });
     });
 
@@ -262,19 +273,18 @@ include_once __DIR__ . '/../includes/sidebar.php';
     });
 
     // --- FUNGSI 3: ISI FORM UNTUK EDIT (Dipanggil tombol Pensil) ---
-    function editMember(id, nama, bio, posisi, status, foto) {
-        // Isi Input dengan Data
+    // TAMBAHAN: Parameter no_telp ditambahkan
+    function editMember(id, nama, bio, posisi, no_telp, status, foto) {
         inputId.value = id;
         inputNama.value = nama;
         inputBio.value = bio;
         inputPosisi.value = posisi;
-        if(inputStatus) inputStatus.value = status; // Set Dropdown
+        inputNoTelp.value = no_telp; // Isi input no telp
+        if(inputStatus) inputStatus.value = status;
         inputExistingFoto.value = foto;
 
-        // UI Update
         formTitle.innerText = 'Edit Data Anggota';
         
-        // Handle Preview Foto Lama
         if (foto) {
             previewImg.src = '../uploads/profile/' + foto;
             previewContainer.style.display = 'block';
@@ -282,12 +292,10 @@ include_once __DIR__ . '/../includes/sidebar.php';
             previewContainer.style.display = 'none';
         }
 
-        // Tampilkan Form
         formContainer.style.display = 'block';
         btnCancel.style.display = 'inline-block';
         btnShow.style.display = 'none';
 
-        // Scroll ke form
         formContainer.scrollIntoView({ behavior: 'smooth' });
     }
 

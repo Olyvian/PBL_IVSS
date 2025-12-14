@@ -1,6 +1,5 @@
 <?php 
 // 1. Koneksi Database
-// Pastikan file config/database.php berisi logic koneksi PDO Anda
 include "config/database.php"; 
 include 'includes/header.php'; 
 
@@ -8,11 +7,9 @@ $members = [];
 
 try {
     // 2. Query Ambil Semua Member
-    // Menggunakan SELECT spesifik untuk keamanan, dan ORDER BY CASE untuk memastikan 
-    // anggota 'aktif' selalu di urutan terdepan, lalu diurutkan berdasarkan nama.
-    $stmt = $pdo->prepare("SELECT id, nama_lengkap, posisi, bio, foto_profil, status 
-                          FROM anggota_lab 
-                          ORDER BY 
+    $stmt = $pdo->prepare("SELECT id, nama_lengkap, posisi, bio, foto_profil, status, nomor_telepon 
+                           FROM anggota_lab 
+                           ORDER BY 
                             CASE 
                               WHEN status = 'aktif' THEN 1 
                               ELSE 2 
@@ -22,20 +19,13 @@ try {
     $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    // Tampilkan error database hanya saat development. 
-    // Di lingkungan produksi, ganti dengan pesan user-friendly dan log error.
     die("Error Database: " . $e->getMessage());
 }
 
-// Fungsi sederhana untuk memotong teks tanpa memotong di tengah kata
 function trim_text($text, $length) {
-    if (strlen($text) <= $length) {
-        return $text;
-    }
-    // Cari posisi spasi terakhir sebelum batas panjang
+    if (strlen($text) <= $length) return $text;
     $last_space = strrpos(substr($text, 0, $length), ' ');
-    $trimmed_text = substr($text, 0, $last_space);
-    return $trimmed_text . '...';
+    return substr($text, 0, $last_space) . '...';
 }
 ?>
 
@@ -49,26 +39,25 @@ function trim_text($text, $length) {
     <link rel="stylesheet" href="assets/css/style_profil.css"> 
 
     <style>
-        /* --- Styling Khusus Member Grid --- */
-
         .member-grid {
             display: grid;
-            /* Grid responsif, minimal lebar kartu 260px */
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
             gap: 30px;
             margin-top: 20px;
         }
 
         .member-card {
-            background-color: #fff; /* var(--card-bg) */
-            border: 1px solid #e0e0e0; /* var(--card-border) */
-            border-radius: 10px;
+            position: relative; /* PENTING: Agar icon Telpon bisa diposisikan absolute di dalam kartu */
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-align: center; 
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
 
         .member-card:hover {
@@ -78,7 +67,7 @@ function trim_text($text, $length) {
 
         .member-img-container {
             width: 100%;
-            height: 280px; /* Tinggi foto tetap agar rapi */
+            height: 260px;
             overflow: hidden;
             background-color: #f9f9f9;
             border-bottom: 1px solid #eee;
@@ -87,17 +76,19 @@ function trim_text($text, $length) {
         .member-img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Agar foto tidak gepeng */
-            object-position: top; /* Fokus ke wajah (atas) */
+            object-fit: cover;
+            object-position: top; 
             transition: transform 0.4s ease;
         }
 
         .member-card:hover .member-img {
-            transform: scale(1.05); /* Efek zoom dikit saat hover */
+            transform: scale(1.05);
         }
 
         .member-info {
             padding: 20px;
+            /* Tambahkan padding bawah ekstra agar teks bio tidak tertutup icon Telpon */
+            padding-bottom: 60px; 
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -105,53 +96,110 @@ function trim_text($text, $length) {
         }
 
         .member-name {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 700;
-            color: #0D4C7C; /* var(--polinema-blue) */
+            color: #0D4C7C; 
             margin: 0 0 5px 0;
+            line-height: 1.3;
         }
 
         .member-role {
-            font-size: 0.95rem;
-            color: #CC0000; /* var(--polinema-red) */
+            font-size: 0.9rem;
+            color: #CC0000; 
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .member-bio {
             font-size: 0.9rem;
-            color: #34495E; /* var(--text-dark) */
+            color: #555;
             line-height: 1.5;
-            margin-bottom: 15px;
-            text-align: justify;
-            /* CSS untuk membatasi tampilan bio menjadi 3 baris */
+            margin-bottom: 10px;
             display: -webkit-box;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        /* Badge Status */
+        /* --- STYLING KHUSUS FLOAT ICON POJOK KANAN BAWAH --- */
+        .wa-float-container {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .wa-icon {
+            /* Reset ukuran kotak dan background */
+            width: auto;
+            height: auto;
+            background-color: transparent; /* Background transparan */
+            box-shadow: none; /* Hilangkan bayangan kotak */
+            border-radius: 0;
+            
+            /* Styling Ikon */
+            color: #0056b3; /* Warna ikon jadi Biru */
+            font-size: 1.8rem; /* Ukuran diperbesar agar jelas karena tanpa kotak */
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        wa-float-container:hover .wa-icon {
+            transform: scale(1.2); /* Efek membesar saat di-hover */
+        }
+
+        /* Tooltip Nomor (Awalnya Sembunyi) */
+        .wa-number-tooltip {
+            background-color: #333;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-right: 10px; /* Jarak dari icon */
+            
+            /* Efek Sembunyi */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px); /* Geser sedikit ke kanan */
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        /* Efek Muncul saat Hover Container */
+        .wa-float-container:hover .wa-number-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0); /* Geser ke posisi normal */
+        }
+
+        /* Posisi Badge Status dipindah ke Kiri Bawah agar seimbang */
+        .status-badge-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
             font-weight: bold;
             text-transform: uppercase;
-            margin-top: auto; /* Dorong ke bawah */
         }
+        .status-aktif { background-color: #e6f4ea; color: #1e7e34; border: 1px solid #c3e6cb; }
+        .status-alumni { background-color: #f8f9fa; color: #6c757d; border: 1px solid #d6d8db; }
 
-        .status-aktif {
-            background-color: #e6f4ea;
-            color: #1e7e34;
-            border: 1px solid #1e7e34;
-        }
-
-        .status-alumni {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #6c757d;
-        }
     </style>
 </head>
 <body>
@@ -175,7 +223,6 @@ function trim_text($text, $length) {
             <div class="member-card">
                 <div class="member-img-container">
                     <?php 
-                        // Tentukan path foto profil atau gunakan default
                         $foto = !empty($m['foto_profil']) 
                                 ? 'uploads/profile/' . $m['foto_profil'] 
                                 : 'assets/img/default-profile.png'; 
@@ -189,20 +236,32 @@ function trim_text($text, $length) {
                     
                     <p class="member-bio">
                         <?php 
-                            // Tampilkan bio yang sudah dibersihkan dari tag HTML dan dipotong
                             $clean_bio = strip_tags($m['bio']);
                             echo htmlspecialchars(trim_text($clean_bio, 80));
                         ?>
                     </p>
-
-                    <?php if (isset($m['status']) && $m['status'] == 'aktif'): ?>
-                        <span class="status-badge status-aktif">Aktif</span>
-                    <?php elseif (isset($m['status']) && $m['status'] == 'alumni'): ?>
-                        <span class="status-badge status-alumni">Alumni</span>
-                    <?php else: ?>
-                        <span class="status-badge status-aktif">Aktif</span>
-                    <?php endif; ?>
                 </div>
+
+                <div class="status-badge-container">
+                    <?php 
+                        $statusClass = ($m['status'] == 'alumni') ? 'status-alumni' : 'status-aktif';
+                        $statusLabel = ($m['status'] == 'alumni') ? 'Alumni' : 'Aktif';
+                    ?>
+                    <span class="status-badge <?= $statusClass ?>"><?= $statusLabel ?></span>
+                </div>
+
+                <?php if (!empty($m['nomor_telepon'])): ?>
+                <div class="wa-float-container">
+                    <div class="wa-number-tooltip">
+                        <?= htmlspecialchars($m['nomor_telepon']) ?>
+                    </div>
+                    
+                    <div class="wa-icon">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                </div>
+                <?php endif; ?>
+
             </div>
             <?php endforeach; ?>
 
@@ -210,6 +269,4 @@ function trim_text($text, $length) {
     </div>
 </main>
 
-<?php
-include 'includes/footer.php'; 
-?>
+<?php include 'includes/footer.php'; ?>

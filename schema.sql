@@ -17,6 +17,7 @@ CREATE TABLE anggota_lab (
   posisi VARCHAR(50) NOT NULL,
   bio TEXT NULL,
   foto_profil VARCHAR(255) NULL,
+  nomor_telepon VARCHAR(20) NULL, -- Kolom baru
   status VARCHAR(20) NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif', 'alumni')),
   CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );

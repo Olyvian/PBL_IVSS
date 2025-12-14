@@ -1,4 +1,3 @@
-
 <?php 
 include "config/database.php";
 include 'includes/header.php'; 
@@ -8,55 +7,51 @@ $news_list = [];
 $featured = [];
 
 try {
-    // 2. Query untuk Berita Utama (Featured) - Ambil 1 berita terbaru
+    // Query Berita Utama
     $query_featured = $pdo->prepare("SELECT * FROM berita ORDER BY created_at DESC LIMIT 1");
     $query_featured->execute();
     $row_featured = $query_featured->fetch();
 
     if ($row_featured) {
         $has_featured = true;
-
-        // 3. Mapping Data Database -> Variabel HTML
-        // Kita siapkan data agar mudah dipanggil di HTML bawah
         $featured = [
             'judul'      => $row_featured['judul'], 
             'created_at' => $row_featured['created_at'],
-            // Potong isi berita jadi pendek (250 karakter) untuk isi
-            'isi'  => substr(strip_tags($row_featured['isi']), 0, 250) . '...', 
-            // Cek apakah ada gambar header
+            'isi'        => substr(strip_tags($row_featured['isi']), 0, 250) . '...', 
             'gambar'     => !empty($row_featured['gambar_header']) 
                             ? 'uploads/news/' . $row_featured['gambar_header'] 
                             : 'assets/img/placeholder.png', 
-            // Link menuju halaman detail membawa ID
-            'link'       => 'detail_berita.php?id=' . $row_featured['id'] 
+            'link'       => 'detail_berita.php?id=' . $row_featured['id'],
+            'tipe'       => $row_featured['tipe'] 
         ];
         
-        // 4. Query untuk Berita Lainnya (Grid) - Kecuali yang sudah jadi featured
+        // Query Berita Lainnya
         $query_list = $pdo->prepare("SELECT * FROM berita WHERE id != :id_featured ORDER BY created_at DESC");
         $query_list->execute(['id_featured' => $row_featured['id']]);
         $rows_list = $query_list->fetchAll();
 
-        // Mapping data berita lainnya
         foreach($rows_list as $row) {
             $news_list[] = [
                 'judul'      => $row['judul'],
                 'created_at' => $row['created_at'],
-                'isi'  => substr(strip_tags($row['isi']), 0, 150) . '...',
+                'isi'        => substr(strip_tags($row['isi']), 0, 150) . '...',
                 'gambar'     => !empty($row['gambar_header']) 
                                 ? 'uploads/news/' . $row['gambar_header'] 
                                 : 'assets/img/placeholder.png',
-                'link'       => 'detail_berita.php?id=' . $row['id']
+                'link'       => 'detail_berita.php?id=' . $row['id'],
+                'tipe'       => $row['tipe']
             ];
         }
 
     } else {
-        // Data Dummy jika Database Kosong
+        // Data Dummy
         $featured = [
-            'gambar'     => '../assets/img/no-news.png', 
+            'gambar'     => 'assets/img/no-news.png', 
             'judul'      => 'Belum Ada Berita Terbaru',
             'created_at' => date('Y-m-d'),
-            'isi'  => 'Saat ini belum ada berita atau pengumuman yang tersedia di database.',
-            'link'       => '#'
+            'isi'        => 'Saat ini belum ada berita atau pengumuman yang tersedia.',
+            'link'       => '#',
+            'tipe'       => 'umum'
         ];
     }
     
@@ -65,7 +60,6 @@ try {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -73,6 +67,32 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Berita dan Pengumuman - Laboratorium IVSS</title>
     <link rel="stylesheet" href="assets/css/style_profil.css">
+
+    <style>
+        /* 1. Pastikan Container Parent Relative */
+        .featured-news-content, 
+        .news-item-content {
+            position: relative; /* Agar badge bisa diposisikan absolute terhadap kotak ini */
+            padding-bottom: 50px; /* Memberi ruang di bawah agar teks tidak menabrak badge */
+        }
+
+        /* 2. Styling Badge Absolute */
+        .badge-tipe {
+            position: absolute;
+            bottom: 20px; /* Jarak dari bawah */
+            right: 20px;  /* Jarak dari kanan */
+            
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 10px; /* Membuatnya lebih bulat (pill shape) */
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: black;
+            background-color: #ffc107;
+        }
+    </style>
 </head>
 <body>
 
@@ -88,10 +108,16 @@ try {
         <div class="featured-news-card">
             <img src="<?= $featured['gambar'] ?>" alt="Gambar Berita Utama">
             <div class="featured-news-content">
+                
                 <h4><?= $featured['judul'] ?></h4>
                 <span class="date-meta"><?= date("d F Y", strtotime($featured['created_at'])) ?></span>
                 <p><?= $featured['isi'] ?></p>
+                
                 <a href="<?= $featured['link'] ?>">Baca Selengkapnya →</a>
+
+                <span class="badge-tipe badge-<?= strtolower($featured['tipe']) ?>">
+                    <?= htmlspecialchars($featured['tipe']) ?>
+                </span>
             </div>
         </div>
 
@@ -110,10 +136,17 @@ try {
             <div class="news-item-grid">
                 <img src="<?= $news['gambar'] ?>" alt="Thumbnail Berita">
                 <div class="news-item-content">
+                    
                     <h4><?= $news['judul'] ?></h4>
                     <span class="date-meta"><?= date("d F Y", strtotime($news['created_at'])) ?></span>
                     <p><?= $news['isi'] ?></p>
+                    
                     <a href="<?= $news['link'] ?>">Baca Selengkapnya →</a>
+
+                    <span class="badge-tipe badge-<?= strtolower($news['tipe']) ?>">
+                        <?= htmlspecialchars($news['tipe']) ?>
+                    </span>
+
                 </div>
             </div>
         <?php endforeach; ?>
