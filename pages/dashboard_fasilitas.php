@@ -8,7 +8,7 @@ require_once __DIR__ . '/../includes/auth.php';
 $pageTitle = 'Manajemen Fasilitas';
 $activePage = 'fasilitas';
 
-// --- 1. LOGIKA SIMPAN (TAMBAH & EDIT) ---
+// --- LOGIKA SIMPAN (TAMBAH & EDIT) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $judul = $_POST['judul'];
     $jenis = $_POST['jenis'];
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// --- 2. LOGIKA HAPUS ---
+// --- LOGIKA HAPUS ---
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     
@@ -70,7 +70,7 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// --- 3. AMBIL DATA ---
+// --- AMBIL DATA ---
 $stmt = $pdo->query("SELECT * FROM fasilitas_peralatan ORDER BY jenis ASC, judul ASC");
 $list = $stmt->fetchAll();
 
