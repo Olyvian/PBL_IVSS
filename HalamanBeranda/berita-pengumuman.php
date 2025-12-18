@@ -68,7 +68,7 @@ try {
     </nav>
 
 <section class="hero-section">
-    <h1>IVSS Laboratory News and Announcements</h1>
+    <h1>Berita dan Pengumuman Laboratorium IVSS</h1>
 </section>
 
 <main class="main-content">

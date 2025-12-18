@@ -96,12 +96,12 @@ Penelitian di laboratorium ini mengintegrasikan computer vision, AI, dan IoT unt
 
         <section class="vision-mission-section">
             <div class="card vision-card">
-                <h4 class="card-title">VISION</h4>
+                <h4 class="card-title">VISi</h4>
                 <p><?= htmlspecialchars($visi) ?></p>
             </div>
 
             <div class="card mission-card">
-                <h4 class="card-title">MISSION</h4>
+                <h4 class="card-title">MISi</h4>
                 <ul>
                     <?php if (count($misiList) > 0): ?>
                         <?php foreach ($misiList as $m): ?>

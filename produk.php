@@ -83,7 +83,7 @@ try {
 <body>
 
     <section class="hero-section">
-        <h1>Our Innovative Products & Prototypes</h1>
+        <h1>Prototype dan Inovasi Produk Kami</h1>
     </section>
 
     <main class="main-content">

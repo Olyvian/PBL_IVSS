@@ -34,7 +34,7 @@ function trim_text($text, $length) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member - Laboratorium IVSS</title>
+    <title>Anggota - Laboratorium IVSS</title>
     
     <link rel="stylesheet" href="assets/css/style_profil.css"> 
 
@@ -205,7 +205,7 @@ function trim_text($text, $length) {
 <body>
 
 <section class="hero-section">
-    <h1>Our Laboratory Members & Team</h1>
+    <h1>Anggota Laboratorium Kami</h1>
 </section>
 
 <main class="main-content">
