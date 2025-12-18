@@ -97,7 +97,7 @@ try {
 <body>
 
 <section class="hero-section">
-    <h1>IVSS Laboratory News and Announcements</h1>
+    <h1>Berita dan Pengumuman </H1>
 </section>
 
 <main class="main-content">

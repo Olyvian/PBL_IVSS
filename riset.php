@@ -198,8 +198,7 @@ try {
 <body>
 
 <section class="hero-section">
-    <h1>Riset dan Inovasi</h1>
-    <p>Menjelajahi batas teknologi melalui riset Laboratorium IVSS</p>
+    <h1>Riset dan Inovasi Kami</h1>
 </section>
 
 <main class="content-riset">

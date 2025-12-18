@@ -40,13 +40,16 @@ function trim_text($text, $length) {
 
     <style>
         .member-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            display: flex;
+            flex-wrap: wrap; 
             gap: 30px;
             margin-top: 20px;
         }
 
         .member-card {
+            flex: 0 1 300px;
+            width: 100%;
+            max-width: 300px;
             position: relative; /* PENTING: Agar icon Telpon bisa diposisikan absolute di dalam kartu */
             background-color: #fff;
             border: 1px solid #e0e0e0;
@@ -211,9 +214,9 @@ function trim_text($text, $length) {
 <main class="main-content">
     <h3 class="section-title">Anggota Laboratorium IVSS</h3>
 
-    <div class="news-list-container">
+    <div class="news-list-container" >
         
-        <div class="member-grid">
+        <div class="member-grid"style="justify-content:center">
 
             <?php if (empty($members)): ?>
                 <p style="text-align:center; width:100%; grid-column: 1 / -1;">Belum ada data anggota.</p>
