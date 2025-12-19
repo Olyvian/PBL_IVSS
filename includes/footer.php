@@ -1,21 +1,16 @@
 <style>
-    /* Catatan: CSS ini menggunakan variabel dari :root yang Anda kirim.
-       Pastikan style_profil.css sudah termuat di halaman utama.
-    */
 
     .footer-polinema {
-        background-color: var(--polinema-blue); /* Biru Utama #0D4C7C */
-        color: var(--text-light);               /* Putih #ffffff */
+        background-color: var(--polinema-blue); 
+        color: var(--text-light);               
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         padding-top: 60px;
         margin-top: auto;
         font-size: 15px;
         position: relative;
-        /* Garis atas menggunakan Merah Aksen */
         border-top: 5px solid var(--polinema-dark-gradient); 
     }
 
-    /* Container Utama: Grid */
     .footer-container {
         max-width: 1200px;
         margin: 0 auto;
@@ -25,7 +20,6 @@
         gap: 60px;
     }
 
-    /* --- KOLOM 1: IDENTITAS --- */
     .footer-brand-box {
         display: flex;
         align-items: center;
@@ -36,7 +30,7 @@
         width: 65px;
         height: 65px;
         margin-right: 15px;
-        background: var(--text-light); /* Putih */
+        background: var(--text-light); 
         padding: 5px;
         border-radius: 50%;
         object-fit: contain;
@@ -63,19 +57,17 @@
         margin: 10px 0;
         display: flex;
         align-items: center;
-        color: var(--footer-link); /* Abu-abu terang #CCCCCC */
+        color: var(--footer-link); 
     }
 
     .footer-contact i {
         width: 25px;
-        /* Menggunakan Putih agar kontras di atas biru tua */
         color: var(--text-light); 
         text-align: center;
         margin-right: 10px;
         font-size: 1.1em;
     }
 
-    /* --- KOLOM 2 & 3: JUDUL & LINK --- */
     .footer-heading {
         font-size: 18px;
         font-weight: 700;
@@ -85,7 +77,6 @@
         padding-bottom: 10px;
     }
 
-    /* Garis bawah judul menggunakan Merah Aksen */
     .footer-heading::after {
         content: '';
         position: absolute;
@@ -93,7 +84,7 @@
         bottom: 0;
         width: 30px;
         height: 3px;
-        background-color: var(--polinema-dark-gradient); /* Merah #CC0000 */
+        background-color: var(--polinema-dark-gradient);
         border-radius: 2px;
     }
 
@@ -105,7 +96,6 @@
 
     .footer-links li {
         margin-bottom: 12px;
-        /* Garis pemisah tipis menggunakan warna border yang ada */
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding-bottom: 12px;
     }
@@ -115,18 +105,17 @@
     }
 
     .footer-links a {
-        color: var(--footer-link); /* Abu-abu #CCCCCC */
+        color: var(--footer-link);
         text-decoration: none;
         transition: 0.3s;
         display: block;
     }
 
     .footer-links a:hover {
-        color: var(--text-light); /* Putih saat hover */
+        color: var(--text-light);
         padding-left: 5px;
     }
 
-    /* --- KOLOM 3: TOMBOL & EKSTERNAL --- */
     .footer-desc {
         font-size: 14px;
         color: var(--footer-link);
@@ -134,13 +123,12 @@
         margin-bottom: 20px;
     }
 
-    /* === TOMBOL DAFTAR (MERAH) === */
     .btn-footer-cta {
         display: inline-block;
-        background-color: var(--polinema-red); /* Merah #CC0000 */
-        color: var(--text-light);              /* Putih */
+        background-color: var(--polinema-red);
+        color: var(--text-light);              
         padding: 10px 25px;
-        border-radius: 4px; /* Radius kecil agar formal */
+        border-radius: 4px;
         font-weight: 600;
         text-decoration: none;
         font-size: 14px;
@@ -149,11 +137,9 @@
     }
 
     .btn-footer-cta:hover {
-        /* Saat hover: Background Putih, Teks Merah */
         background-color: var(--text-light); 
         color: var(--polinema-red);
     }
-    /* ============================= */
 
     .external-links {
         margin-top: 30px;
@@ -193,10 +179,8 @@
         margin-left: 5px;
         color: var(--text-light);
     }
-
-    /* --- COPYRIGHT BAR --- */
     .footer-bottom {
-        background-color: rgba(0,0,0,0.2); /* Gelapkan sedikit dari background utama */
+        background-color: rgba(0,0,0,0.2);
         text-align: center;
         padding: 20px;
         font-size: 14px;
@@ -204,7 +188,6 @@
         border-top: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* --- RESPONSIVE --- */
     @media (max-width: 900px) {
         .footer-container {
             grid-template-columns: 1fr;

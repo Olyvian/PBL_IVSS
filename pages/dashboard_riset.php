@@ -1,20 +1,18 @@
 <?php
-require_once __DIR__ . '/../config/database.php'; // PASTIkan file ini mendefinisikan $pdo (objek PDO)!
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-// Set judul dan halaman aktif
 $pageTitle = 'Riset';
 $activePage = 'riset';
 
-// Inisialisasi pesan
 $error_message = null;
 $success_message = null;
 $anggota_error = null;
 $riset_data = [];
 $anggota_list = [];
-$riset_to_edit = null; // Variabel untuk menyimpan data riset saat mode EDIT
+$riset_to_edit = null;
 
-// Tangani pesan dari sesi (setelah redirect dari operasi CRUD)
+// Handle session messages
 if (isset($_SESSION['success_message'])) {
     $success_message = $_SESSION['success_message'];
     unset($_SESSION['success_message']);
@@ -24,17 +22,15 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-// --- Tambahan: Query untuk mengambil daftar anggota (untuk formulir) ---
+// Fetch member list for dropdown
 try {
     $stmt_anggota = $pdo->query("SELECT id, nama_lengkap FROM anggota_lab ORDER BY nama_lengkap ASC");
     $anggota_list = $stmt_anggota->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    $anggota_error = "Gagal mengambil daftar anggota: " . $e->getMessage();
+    $anggota_error = "Failed to load members: " . $e->getMessage();
 }
 
-// --- Bagian Logika Server (CRUD) ---
-
-// 1. Logika DELETE
+// --- Handle Delete Action ---
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $riset_id = (int)$_GET['id'];
     try {
@@ -44,10 +40,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         $stmt_title->execute([$riset_id]);
         $riset_title = $stmt_title->fetchColumn() ?: "ID: {$riset_id}";
 
-        // 1a. Hapus entri di tabel 'riset_anggota'
         $pdo->prepare("DELETE FROM riset_anggota WHERE riset_id = ?")->execute([$riset_id]);
-
-        // 1b. Hapus entri di tabel 'riset'
         $pdo->prepare("DELETE FROM riset WHERE id = ?")->execute([$riset_id]);
 
         $pdo->commit();
@@ -57,49 +50,43 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 
     } catch (PDOException $e) {
         $pdo->rollBack();
-        $_SESSION['error_message'] = "Gagal menghapus riset (DB Error): " . $e->getMessage();
+        $_SESSION['error_message'] = "Gagal menghapus riset: " . $e->getMessage();
         header("Location: dashboard_riset.php");
         exit();
     }
 }
 
-// 2. Logika EDIT (Mengisi form saat action=edit)
+// --- Prepare Edit View ---
 $show_edit_form = false;
 $riset_anggota_ids = [];
 if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
     $riset_id = (int)$_GET['id'];
     try {
-        // Ambil detail Riset
         $stmt_riset = $pdo->prepare("SELECT * FROM riset WHERE id = ?");
         $stmt_riset->execute([$riset_id]);
         $riset_to_edit = $stmt_riset->fetch(PDO::FETCH_ASSOC);
 
         if ($riset_to_edit) {
             $show_edit_form = true;
-            // Ambil anggota tim yang sudah dipilih
             $stmt_anggota_current = $pdo->prepare("SELECT anggota_id FROM riset_anggota WHERE riset_id = ?");
             $stmt_anggota_current->execute([$riset_id]);
             $riset_anggota_ids = $stmt_anggota_current->fetchAll(PDO::FETCH_COLUMN);
         } else {
-            $error_message = "Data riset yang ingin diubah tidak ditemukan.";
+            $error_message = "Data riset tidak ditemukan.";
         }
-
     } catch (PDOException $e) {
-        $error_message = "Error saat mengambil data riset untuk diedit: " . $e->getMessage();
+        $error_message = "Error fetching data: " . $e->getMessage();
     }
 }
 
-
-// 3. Logika CREATE (Menambah data riset) & UPDATE (Memperbarui data riset)
+// --- Handle Form Submission (Create & Update) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_update = isset($_POST['update_riset']);
     $riset_id = $is_update ? (int)$_POST['riset_id'] : null;
 
     $judul_riset = trim($_POST['judul_riset']);
     $deskripsi = trim($_POST['deskripsi']);
-    // --- MODIFIKASI: Ambil link_riset dari POST ---
     $link_riset = empty($_POST['link_riset']) ? null : trim($_POST['link_riset']);
-    // ---------------------------------------------
     $tanggal_mulai = empty($_POST['tanggal_mulai']) ? null : $_POST['tanggal_mulai'];
     $tanggal_selesai = empty($_POST['tanggal_selesai']) ? null : $_POST['tanggal_selesai'];
     $anggota_ids = $_POST['anggota_ids'] ?? [];
@@ -109,28 +96,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->beginTransaction();
 
             if ($is_update) {
-                // UPDATE (Memperbarui)
-                // --- MODIFIKASI SQL: Tambahkan link_riset ---
+                // Update Logic
                 $sql_riset = "UPDATE riset SET judul_riset = ?, deskripsi = ?, link_riset = ?, tanggal_mulai = ?, tanggal_selesai = ? WHERE id = ?";
                 $stmt_riset = $pdo->prepare($sql_riset);
                 $stmt_riset->execute([$judul_riset, $deskripsi, $link_riset, $tanggal_mulai, $tanggal_selesai, $riset_id]);
-                // ---------------------------------------------
                 
-                // Update Anggota: Hapus lama, masukkan baru
+                // Refresh members association
                 $pdo->prepare("DELETE FROM riset_anggota WHERE riset_id = ?")->execute([$riset_id]);
                 $action_message = "diperbarui";
             } else {
-                // CREATE (Menambah)
-                // --- MODIFIKASI SQL: Tambahkan link_riset ---
+                // Insert Logic
                 $sql_riset = "INSERT INTO riset (judul_riset, deskripsi, link_riset, tanggal_mulai, tanggal_selesai) VALUES (?, ?, ?, ?, ?)";
                 $stmt_riset = $pdo->prepare($sql_riset);
                 $stmt_riset->execute([$judul_riset, $deskripsi, $link_riset, $tanggal_mulai, $tanggal_selesai]);
-                // ---------------------------------------------
                 $riset_id = $pdo->lastInsertId();
                 $action_message = "ditambahkan";
             }
 
-            // Insert Anggota
+            // Insert Member Associations
             if (!empty($anggota_ids) && $riset_id) {
                 $sql_anggota = "INSERT INTO riset_anggota (riset_id, anggota_id) VALUES (?, ?)";
                 $stmt_anggota = $pdo->prepare($sql_anggota);
@@ -148,27 +131,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } catch (PDOException $e) {
             $pdo->rollBack();
-            $error_message = "Gagal {$action_message} riset (DB Error): " . $e->getMessage();
-            // Jika gagal, pastikan data yang di-post tetap ada di form
+            $error_message = "Database Error: " . $e->getMessage();
             if ($is_update && $riset_to_edit) {
                  $riset_to_edit = array_merge($riset_to_edit, $_POST);
-                 $riset_anggota_ids = $anggota_ids; // Pertahankan pilihan anggota
+                 $riset_anggota_ids = $anggota_ids; 
                  $show_edit_form = true;
-            } else {
-                 // Jika CREATE gagal, biarkan form Tambah terbuka
             }
         }
     } else {
-        $error_message = "Judul dan Deskripsi riset wajib diisi.";
-        // Jika CREATE gagal, biarkan form Tambah terbuka
+        $error_message = "Judul dan Deskripsi wajib diisi.";
     }
 }
 
-
-// 4. Logika READ (Mengambil data riset dengan anggota tim)
+// --- Fetch Data for Table ---
 try {
-    // Query untuk mengambil semua data riset dan anggota tim
-    // --- MODIFIKASI SQL: Tambahkan r.link_riset ---
     $sql_read = "
         SELECT 
             r.id, r.judul_riset, r.deskripsi, r.link_riset, r.tanggal_mulai, r.tanggal_selesai,
@@ -179,20 +155,13 @@ try {
         GROUP BY r.id, r.judul_riset, r.deskripsi, r.link_riset, r.tanggal_mulai, r.tanggal_selesai
         ORDER BY r.id DESC
     ";
-    // ---------------------------------------------
     $stmt = $pdo->query($sql_read);
     $riset_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
-    // Tampilkan pesan error jika query READ gagal
-    $error_message = "Error saat mengambil data riset: " . $e->getMessage();
+    $error_message = "Error loading list: " . $e->getMessage();
 }
 
-// Hitung total riset
-$totalRiset = count($riset_data);
-
-
-// Panggil Header/Sidebar
 include_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
@@ -208,7 +177,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
 
     <div class="form-container" id="risetFormContainer" style="display: <?php echo $show_edit_form ? 'block' : 'none'; ?>;">
         <h4 id="risetFormTitle">
-            <?php echo $show_edit_form ? '✏️ Ubah Data Riset: ' . htmlspecialchars($riset_to_edit['judul_riset'] ?? 'Tidak Ditemukan') : '➕ Tambah Riset Baru'; ?>
+            <?php echo $show_edit_form ? 'Edit Data Riset: ' . htmlspecialchars($riset_to_edit['judul_riset'] ?? '') : 'Tambah Riset Baru'; ?>
         </h4>
 
         <?php if ($show_edit_form && $riset_to_edit): ?>
@@ -223,47 +192,42 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 </div>
                 
                 <div class="form-group">
-                    <label for="link_riset_edit">Link Dokumen Riset (URL Opsional):</label>
+                    <label for="link_riset_edit">Link Dokumen (URL):</label>
                     <input type="url" class="form-control" id="link_riset_edit" name="link_riset" 
-                        value="<?= htmlspecialchars($riset_to_edit['link_riset'] ?? '') ?>" placeholder="Masukkan URL dokumen riset">
+                        value="<?= htmlspecialchars($riset_to_edit['link_riset'] ?? '') ?>" placeholder="https://...">
                 </div>
                 
                 <div class="form-group">
-                    <label for="deskripsi_edit">Deskripsi Riset:</label>
+                    <label for="deskripsi_edit">Deskripsi:</label>
                     <textarea class="form-control" id="deskripsi_edit" name="deskripsi" rows="3" required><?= htmlspecialchars($riset_to_edit['deskripsi']) ?></textarea>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 form-group">
-                        <label for="tanggal_mulai_edit">Tanggal Mulai (Opsional):</label>
+                        <label for="tanggal_mulai_edit">Mulai:</label>
                         <input type="date" class="form-control" id="tanggal_mulai_edit" name="tanggal_mulai" 
                             value="<?= htmlspecialchars($riset_to_edit['tanggal_mulai']) ?>">
                     </div>
                     <div class="col-md-6 form-group">
-                        <label for="tanggal_selesai_edit">Tanggal Selesai (Opsional):</label>
+                        <label for="tanggal_selesai_edit">Selesai:</label>
                         <input type="date" class="form-control" id="tanggal_selesai_edit" name="tanggal_selesai" 
                             value="<?= htmlspecialchars($riset_to_edit['tanggal_selesai']) ?>">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="anggota_ids_edit">Anggota Tim (Opsional - Multi-Select):</label>
-                    <select class="form-select" id="anggota_ids_edit" name="anggota_ids[]" multiple>
-                        <option value="">Pilih Anggota Tim...</option>
-                        <?php if (isset($anggota_error)): ?>
-                            <option disabled><?= htmlspecialchars($anggota_error) ?></option>
-                        <?php else: ?>
-                            <?php foreach ($anggota_list as $anggota): ?>
-                                <?php 
-                                    $selected = in_array($anggota['id'], array_map('strval', $riset_anggota_ids)) ? 'selected' : '';
-                                ?>
-                                <option value="<?= htmlspecialchars($anggota['id']) ?>" <?= $selected ?>>
-                                    <?= htmlspecialchars($anggota['nama_lengkap']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                    <label for="anggota_ids_edit">Anggota Tim:</label>
+                    <select class="form-select" id="anggota_ids_edit" name="anggota_ids[]" multiple style="width: 100%; height: 150px;">
+                        <?php foreach ($anggota_list as $anggota): ?>
+                            <?php 
+                                $selected = in_array($anggota['id'], array_map('strval', $riset_anggota_ids)) ? 'selected' : '';
+                            ?>
+                            <option value="<?= htmlspecialchars($anggota['id']) ?>" <?= $selected ?>>
+                                <?= htmlspecialchars($anggota['nama_lengkap']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
-                    <small class="form-text text-muted">Gunakan **Ctrl/Cmd** untuk memilih lebih dari satu.</small>
+                    <small class="text-muted">Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih banyak.</small>
                 </div>
                 
                 <div class="form-actions">
@@ -272,57 +236,49 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 </div>
             </form>
         <?php else: ?>
-            <div class="collapse mt-3 
-                <?php if (isset($error_message) && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_riset'])) echo 'show'; ?> 
-            " id="formTambahRiset">
+            <div id="formTambahRiset">
                 <form method="POST" action="dashboard_riset.php" id="formTambahRisetActual">
                     <input type="hidden" name="tambah_riset" value="1">
                     
                     <div class="form-group">
                         <label for="judul_riset_tambah">Judul Riset:</label>
-                        <input type="text" class="form-control" id="judul_riset_tambah" name="judul_riset" required value="<?= htmlspecialchars($_POST['judul_riset'] ?? '') ?>" placeholder="Masukkan judul riset">
+                        <input type="text" class="form-control" id="judul_riset_tambah" name="judul_riset" required value="<?= htmlspecialchars($_POST['judul_riset'] ?? '') ?>">
                     </div>
                     
                     <div class="form-group">
-                        <label for="link_riset_tambah">Link Dokumen Riset (URL Opsional):</label>
+                        <label for="link_riset_tambah">Link Dokumen (URL):</label>
                         <input type="url" class="form-control" id="link_riset_tambah" name="link_riset" 
-                            value="<?= htmlspecialchars($_POST['link_riset'] ?? '') ?>" placeholder="Masukkan URL dokumen riset">
+                            value="<?= htmlspecialchars($_POST['link_riset'] ?? '') ?>" placeholder="https://...">
                     </div>
                     
                     <div class="form-group">
-                        <label for="deskripsi_tambah">Deskripsi Riset:</label>
-                        <textarea class="form-control" id="deskripsi_tambah" name="deskripsi" placeholder="Deskripsi riset" rows="3" 
-                        required><?= htmlspecialchars($_POST['deskripsi'] ?? '') ?></textarea>
+                        <label for="deskripsi_tambah">Deskripsi:</label>
+                        <textarea class="form-control" id="deskripsi_tambah" name="deskripsi" rows="3" required><?= htmlspecialchars($_POST['deskripsi'] ?? '') ?></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 form-group">
-                            <label for="tanggal_mulai_tambah">Tanggal Mulai (Opsional):</label>
+                            <label for="tanggal_mulai_tambah">Mulai:</label>
                             <input type="date" class="form-control" id="tanggal_mulai_tambah" name="tanggal_mulai" value="<?= htmlspecialchars($_POST['tanggal_mulai'] ?? '') ?>">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="tanggal_selesai_tambah">Tanggal Selesai (Opsional):</label>
+                            <label for="tanggal_selesai_tambah">Selesai:</label>
                             <input type="date" class="form-control" id="tanggal_selesai_tambah" name="tanggal_selesai" value="<?= htmlspecialchars($_POST['tanggal_selesai'] ?? '') ?>">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="anggota_ids_tambah">Anggota Tim (Opsional - Multi-Select):</label>
-                        <select class="form-select" id="anggota_ids_tambah" name="anggota_ids[]" multiple>
-                            <option value="">Pilih Anggota Tim...</option>
-                            <?php if (isset($anggota_error)): ?>
-                                <option disabled><?= htmlspecialchars($anggota_error) ?></option>
-                            <?php else: ?>
-                                <?php foreach ($anggota_list as $anggota): ?>
-                                    <option value="<?= htmlspecialchars($anggota['id']) ?>"><?= htmlspecialchars($anggota['nama_lengkap']) ?></option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                        <label for="anggota_ids_tambah">Anggota Tim:</label>
+                        <select class="form-select" id="anggota_ids_tambah" name="anggota_ids[]" multiple style="width: 100%; height: 150px;">
+                            <?php foreach ($anggota_list as $anggota): ?>
+                                <option value="<?= htmlspecialchars($anggota['id']) ?>"><?= htmlspecialchars($anggota['nama_lengkap']) ?></option>
+                            <?php endforeach; ?>
                         </select>
-                        <small class="form-text text-muted">Gunakan **Ctrl/Cmd** untuk memilih lebih dari satu.</small>
+                        <small class="text-muted">Tahan Ctrl (Windows) atau Cmd (Mac) untuk memilih banyak.</small>
                     </div>
                     
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Simpan Riset</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
                         <button type="button" class="btn btn-secondary" id="btnCancelTambah">Batal</button>
                     </div>
                 </form>
@@ -339,15 +295,15 @@ include_once __DIR__ . '/../includes/sidebar.php';
         <?php endif; ?>
 
         <?php if (empty($riset_data)): ?>
-            <div class="alert alert-info">Belum ada data riset yang tercatat. Silakan tambahkan riset baru.</div>
+            <div class="alert alert-info">Belum ada riset.</div>
         <?php else: ?>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Judul & Deskripsi</th>
-                            <th class="table-tipe-col">Link</th> <th>Anggota Tim</th>
+                            <th class="table-tipe-col">Link</th> 
+                            <th>Anggota Tim</th>
                             <th class="table-date-col">Periode</th>
                             <th class="table-aksi-col">Aksi</th>
                         </tr>
@@ -355,14 +311,13 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     <tbody>
                         <?php foreach ($riset_data as $riset): ?>
                             <tr>
-                                <td><?= htmlspecialchars($riset['id']) ?></td>
                                 <td>
                                     <strong><?= htmlspecialchars($riset['judul_riset']) ?></strong>
                                     <br><small class="text-muted"><?= substr(htmlspecialchars($riset['deskripsi']), 0, 80) ?>...</small>
                                 </td>
                                 <td class="table-tipe-col">
                                     <?php if (!empty($riset['link_riset'])): ?>
-                                        <a href="<?= htmlspecialchars($riset['link_riset']) ?>" target="_blank" class="btn-icon btn-edit" title="Lihat Dokumen">
+                                        <a href="<?= htmlspecialchars($riset['link_riset']) ?>" target="_blank" class="btn-icon btn-edit" title="Lihat">
                                             <i class="fa-solid fa-link"></i>
                                         </a>
                                     <?php else: ?>
@@ -379,7 +334,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                                         <i class="fa-solid fa-pencil"></i>
                                     </a>
                                     <a href="dashboard_riset.php?action=delete&id=<?= $riset['id'] ?>" class="btn-icon btn-delete" title="Hapus" 
-                                        onclick="return confirm('Yakin ingin menghapus riset: <?= htmlspecialchars($riset['judul_riset']) ?>?')">
+                                        onclick="return confirm('Hapus riset ini?')">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </a>
                                 </td>
@@ -389,71 +344,50 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 </table>
             </div>
         <?php endif; ?>
-
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const formContainer = document.getElementById('risetFormContainer');
         const btnToggle = document.getElementById('btnToggleRisetForm');
-        const formTambahCollapse = document.getElementById('formTambahRiset'); // Collapse div for Add Form
         const btnCancelTambah = document.getElementById('btnCancelTambah');
         const btnCancelEdit = document.getElementById('btnCancelEdit');
 
         const isCurrentlyEditMode = <?php echo $show_edit_form ? 'true' : 'false'; ?>;
 
-        // Toggle visibility for the Add Form
         btnToggle.addEventListener('click', () => {
             if (isCurrentlyEditMode) {
-                // If currently in Edit mode, clicking toggle is like 'Cancel'
                 window.location.href = 'dashboard_riset.php';
                 return;
             }
 
             if (formContainer.style.display === 'block') {
-                // If currently open (in Add mode), close it
                 formContainer.style.display = 'none';
-                btnToggle.innerText = '➕ Tambah Riset';
-                // Close the collapse (optional, Bootstrap handles it well)
-                const bsCollapse = new bootstrap.Collapse(formTambahCollapse, { toggle: false });
-                bsCollapse.hide();
-
+                btnToggle.innerText = 'Tambah Riset';
             } else {
-                // If closed, open the Add form
                 formContainer.style.display = 'block';
                 btnToggle.innerText = 'Tutup Form';
-                // Open the collapse
-                const bsCollapse = new bootstrap.Collapse(formTambahCollapse, { toggle: false });
-                bsCollapse.show();
-                
-                // Reset form fields on open
                 document.getElementById('formTambahRisetActual').reset();
                 window.scrollTo(0, 0);
             }
         });
 
-        // Handle Cancel button for Add Form
         if (btnCancelTambah) {
             btnCancelTambah.addEventListener('click', () => {
                 formContainer.style.display = 'none';
-                btnToggle.innerText = '➕ Tambah Riset';
-                // Close the collapse
-                const bsCollapse = new bootstrap.Collapse(formTambahCollapse, { toggle: false });
-                bsCollapse.hide();
+                btnToggle.innerText = 'Tambah Riset';
             });
         }
         
-        // Handle Cancel button for Edit Form (only exists in Edit mode)
         if (btnCancelEdit) {
             btnCancelEdit.addEventListener('click', () => {
-                // Redirecting or simply hiding is an option. Redirecting clears the URL param.
                 window.location.href = 'dashboard_riset.php';
             });
         }
 
-        // If an error occurred in POST but it wasn't an update, open the ADD form on load
+        // Auto-open form on error
         <?php if (isset($error_message) && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_riset'])): ?>
             formContainer.style.display = 'block';
             btnToggle.innerText = 'Tutup Form';
@@ -461,7 +395,4 @@ include_once __DIR__ . '/../includes/sidebar.php';
     });
 </script>
 
-<?php
-// Penutup file, jika ada footer
-// include_once __DIR__ . '/../includes/footer.php';
-?>
+<?php include_once __DIR__ . '/../includes/table.php'; ?>

@@ -2,9 +2,6 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-// Proteksi Halaman
-// redirectIfNotLoggedIn(['admin_lab']); 
-
 $pageTitle = 'Manajemen Fasilitas';
 $activePage = 'fasilitas';
 
@@ -263,3 +260,4 @@ include_once __DIR__ . '/../includes/sidebar.php';
         }
     });
 </script>
+<?php include_once __DIR__ . '/../includes/table.php'; ?>

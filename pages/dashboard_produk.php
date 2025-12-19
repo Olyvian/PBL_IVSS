@@ -2,9 +2,6 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-// Proteksi Halaman (Hanya Admin Lab)
-// redirectIfNotLoggedIn(['admin_lab']); 
-
 $pageTitle = 'Manajemen Produk';
 $activePage = 'produk';
 
@@ -246,3 +243,5 @@ include_once __DIR__ . '/../includes/sidebar.php';
         }
     });
 </script>
+
+<?php include_once __DIR__ . '/../includes/table.php'; ?>

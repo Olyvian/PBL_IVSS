@@ -1,9 +1,8 @@
 <?php
 include 'config/database.php';
-// Pastikan path include header benar
 include 'includes/header.php';
 
-// 1. Ambil Data Visi
+// Ambil Data Visi
 try {
     $stmtVisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'visi' ORDER BY konten_id ASC LIMIT 1");
     $stmtVisi->execute();
@@ -12,7 +11,7 @@ try {
     $visi = "Error mengambil visi.";
 }
 
-// 2. Ambil Data Misi
+// Ambil Data Misi
 try {
     $stmtMisi = $pdo->prepare("SELECT deskripsi FROM visi_misi WHERE tipe = 'misi' ORDER BY konten_id ASC");
     $stmtMisi->execute();
@@ -21,7 +20,7 @@ try {
     $misiList = [];
 }
 
-// 3. Ambil Data Fasilitas (UPDATE: Mengambil kolom 'gambar')
+// Ambil Data Fasilitas
 try {
     $stmtFasilitas = $pdo->prepare("SELECT judul, deskripsi, gambar FROM fasilitas_peralatan ORDER BY id");
     $stmtFasilitas->execute();
@@ -90,10 +89,9 @@ try {
                     <?php foreach ($combinedList as $item): ?>
                         <div class="info-card">
                             <?php 
-                                // Cek apakah ada gambar, jika tidak pakai placeholder
                                 $imgSrc = !empty($item['gambar']) 
                                           ? 'uploads/fasilitas/' . $item['gambar'] 
-                                          : 'assets/img/placeholder_fasilitas.png'; // Pastikan ada gambar default
+                                          : 'assets/img/placeholder_fasilitas.png';
                             ?>
                             
                             <img src="<?= htmlspecialchars($imgSrc) ?>" alt="<?= htmlspecialchars($item['judul']) ?>" class="fasilitas-img">

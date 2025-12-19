@@ -6,13 +6,11 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Menentukan Title Halaman secara dinamis
-// Jika halaman induk tidak mendefinisikan $page_title, gunakan default
 $title = isset($page_title) ? $page_title : 'Laboratorium IVSS - POLINEMA';
 
 // Logic Username
 $username_display = 'User';
 if (isset($_SESSION['user_id'])) {
-    // Menggunakan operator coalescing null (??) untuk keamanan
     $username_display = htmlspecialchars($_SESSION['username'] ?? 'User');
 }
 ?>
@@ -29,13 +27,10 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <style>
-        /* --- Bagian CSS Navbar & Header (Diambil dari beranda.php agar konsisten) --- */
-        
         .header-institusi {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            /* Pastikan padding kanan konsisten */
             padding-right: 20px; 
         }
         .logout-container {
@@ -43,12 +38,10 @@ if (isset($_SESSION['user_id'])) {
             align-items: center;
         }
         .user-greeting {
-            color: #fff; /* Diubah menjadi putih sesuai permintaan */
+            color: #fff;
             margin-right: 15px;
             font-size: 0.9rem;
         }
-
-        /* Navbar Centering */
         .navbar {
             display: flex;
             justify-content: center; 
@@ -76,45 +69,36 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .navbar li a:hover,
-        /* Tambahkan style untuk kelas 'active' */
 
         .navbar li.has-dropdown > a {
             padding-right: 20px;
         }
-
-        /* --- Bagian CSS Tambahan untuk Tombol Login/Logout Estetik --- */
         .logout-container a {
             padding: 8px 15px;
-            border-radius: 5px; /* Sudut sedikit membulat */
+            border-radius: 5px;
             font-weight: bold;
             transition: background-color 0.3s ease, transform 0.1s ease;
             text-align: center;
             text-decoration: none;
         }
-
-        /* Style untuk Tombol Logout (Warna Merah Kontras) */
         .logout-container .btn-danger {
-            background-color: #dc3545; /* Merah cerah */
+            background-color: #dc3545;
             border: 1px solid #dc3545;
             color: white;
         }
         .logout-container .btn-danger:hover {
-            background-color: #c82333; /* Merah sedikit lebih gelap saat hover */
+            background-color: #c82333;
             border-color: #bd2130;
         }
-        
-        /* Style untuk Tombol Login (Warna Primary Biru Kontras) */
         .logout-container .service-btn.btn-filled {
-            color: #fff; /* Teks putih */
-            background-color: #007bff; /* Biru Primary */
+            color: #fff;
+            background-color: #007bff;
             border: 1px solid #007bff;
         }
         .logout-container .service-btn.btn-filled:hover {
-            background-color: #0056b3; /* Biru sedikit lebih gelap saat hover */
+            background-color: #0056b3;
             border-color: #004085;
         }
-        
-        /* CSS Umum Tambahan */
         .main-content {
             padding-top: 0;
         }
@@ -133,7 +117,6 @@ if (isset($_SESSION['user_id'])) {
         <div class="logout-container" style="margin-left: auto;">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php
-                // Mengambil nama pengguna untuk ditampilkan
                 $username = htmlspecialchars($_SESSION['username'] ?? 'User');
                 ?>
                 <span class="user-greeting">Haloo, <?php echo $username; ?></span>

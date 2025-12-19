@@ -1,12 +1,11 @@
 <?php 
-// 1. Koneksi Database
 include "config/database.php"; 
 include 'includes/header.php'; 
 
 $members = [];
 
 try {
-    // 2. Query Ambil Semua Member
+    // Query Ambil Semua Member
     $stmt = $pdo->prepare("SELECT id, nama_lengkap, posisi, bio, foto_profil, status, nomor_telepon 
                            FROM anggota_lab 
                            ORDER BY 
@@ -50,7 +49,7 @@ function trim_text($text, $length) {
             flex: 0 1 300px;
             width: 100%;
             max-width: 300px;
-            position: relative; /* PENTING: Agar icon Telpon bisa diposisikan absolute di dalam kartu */
+            position: relative;
             background-color: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 12px;
@@ -90,7 +89,6 @@ function trim_text($text, $length) {
 
         .member-info {
             padding: 20px;
-            /* Tambahkan padding bawah ekstra agar teks bio tidak tertutup icon Telpon */
             padding-bottom: 60px; 
             flex-grow: 1;
             display: flex;
@@ -126,7 +124,6 @@ function trim_text($text, $length) {
             overflow: hidden;
         }
 
-        /* --- STYLING KHUSUS FLOAT ICON POJOK KANAN BAWAH --- */
         .wa-float-container {
             position: absolute;
             bottom: 15px;
@@ -138,16 +135,14 @@ function trim_text($text, $length) {
         }
 
         .wa-icon {
-            /* Reset ukuran kotak dan background */
             width: auto;
             height: auto;
-            background-color: transparent; /* Background transparan */
-            box-shadow: none; /* Hilangkan bayangan kotak */
+            background-color: transparent;
+            box-shadow: none; 
             border-radius: 0;
-            
-            /* Styling Ikon */
-            color: #0056b3; /* Warna ikon jadi Biru */
-            font-size: 1.8rem; /* Ukuran diperbesar agar jelas karena tanpa kotak */
+
+            color: #0056b3; 
+            font-size: 1.8rem; 
             
             display: flex;
             align-items: center;
@@ -157,10 +152,9 @@ function trim_text($text, $length) {
         }
 
         wa-float-container:hover .wa-icon {
-            transform: scale(1.2); /* Efek membesar saat di-hover */
+            transform: scale(1.2); 
         }
 
-        /* Tooltip Nomor (Awalnya Sembunyi) */
         .wa-number-tooltip {
             background-color: #333;
             color: #fff;
@@ -168,24 +162,21 @@ function trim_text($text, $length) {
             border-radius: 20px;
             font-size: 1rem;
             font-weight: 600;
-            margin-right: 10px; /* Jarak dari icon */
-            
-            /* Efek Sembunyi */
+            margin-right: 10px;
+
             opacity: 0;
             visibility: hidden;
-            transform: translateX(10px); /* Geser sedikit ke kanan */
+            transform: translateX(10px); 
             transition: all 0.3s ease;
             white-space: nowrap;
         }
 
-        /* Efek Muncul saat Hover Container */
         .wa-float-container:hover .wa-number-tooltip {
             opacity: 1;
             visibility: visible;
-            transform: translateX(0); /* Geser ke posisi normal */
+            transform: translateX(0);
         }
 
-        /* Posisi Badge Status dipindah ke Kiri Bawah agar seimbang */
         .status-badge-container {
             position: absolute;
             bottom: 20px;

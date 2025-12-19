@@ -2,31 +2,23 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-// redirectIfNotLoggedIn(['admin_lab']); // Aktifkan jika auth sudah siap
-
 $pageTitle = 'Manajemen Member';
 $activePage = 'member';
 
-// --- 1. LOGIKA SIMPAN DATA (TAMBAH & EDIT) ---
+// --- Handle Form Submission ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama_lengkap  = $_POST['nama_lengkap'];
     $bio           = $_POST['bio'];
     $posisi        = $_POST['posisi'];
-    
-    // TAMBAHAN: Ambil data nomor telepon
     $nomor_telepon = $_POST['nomor_telepon']; 
+    $status        = strtolower($_POST['status']); 
+    $foto_profil   = null;
 
-    // Paksa jadi huruf kecil agar lolos check constraint database
-    $status = strtolower($_POST['status']); 
-    
-    $foto_profil = null;
-
-    // Handle Upload Foto
+    // Handle Upload
     if (!empty($_FILES['foto_profil']['name'])) {
         $filename = uniqid() . '_' . basename($_FILES['foto_profil']['name']);
         $uploadPath = __DIR__ . '/../uploads/profile/' . $filename;
         
-        // Buat folder uploads/profile jika belum ada
         if (!is_dir(__DIR__ . '/../uploads/profile/')) {
             mkdir(__DIR__ . '/../uploads/profile/', 0777, true);
         }
@@ -37,21 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!empty($_POST['member_id'])) {
-        // --- Mode EDIT ---
+        // Mode: Update
         $id = $_POST['member_id'];
-        
-        // Jika tidak upload foto baru, gunakan yang lama
         if ($foto_profil === null) {
             $foto_profil = $_POST['existing_foto_profil'] ?? null;
         }
 
-        // TAMBAHAN: Update query termasuk nomor_telepon
         $stmt = $pdo->prepare("UPDATE anggota_lab SET nama_lengkap=?, bio=?, posisi=?, nomor_telepon=?, status=?, foto_profil=? WHERE id=?");
         $stmt->execute([$nama_lengkap, $bio, $posisi, $nomor_telepon, $status, $foto_profil, $id]);
 
     } else {
-        // --- Mode TAMBAH ---
-        // TAMBAHAN: Insert query termasuk nomor_telepon
+        // Mode: Insert
         $stmt = $pdo->prepare("INSERT INTO anggota_lab (nama_lengkap, bio, posisi, nomor_telepon, status, foto_profil) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([$nama_lengkap, $bio, $posisi, $nomor_telepon, $status, $foto_profil]);
     }
@@ -60,16 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// --- 2. LOGIKA HAPUS DATA ---
+// --- Handle Delete ---
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     
-    // Ambil nama file foto lama untuk dihapus
     $stmt = $pdo->prepare("SELECT foto_profil FROM anggota_lab WHERE id=?");
     $stmt->execute([$id]);
     $old = $stmt->fetch();
     
-    // Hapus file fisik gambar jika ada
     if ($old && $old['foto_profil']) {
         $filePath = __DIR__ . "/../uploads/profile/" . $old['foto_profil'];
         if (file_exists($filePath)) {
@@ -83,11 +69,10 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// --- 3. AMBIL DATA DARI DATABASE ---
+// Fetch all members
 $stmt = $pdo->query("SELECT * FROM anggota_lab ORDER BY nama_lengkap ASC");
 $list = $stmt->fetchAll();
 
-// Panggil Header Admin
 include_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
@@ -100,7 +85,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
         <button class="btn btn-secondary" id="btnCancelForm" style="display:none;">Tutup Form</button>
     </div>
 
-    <div class="form-container" id="memberFormContainer" style="display:none;">
+    <div class="form-container" id="memberFormContainer">
         <h4 id="formTitle">Tambah Anggota Baru</h4>
         <form method="POST" enctype="multipart/form-data" id="memberForm">
             <input type="hidden" name="member_id" id="member_id">
@@ -144,7 +129,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                 <img id="image_preview" src="" alt="Preview" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid #eee;">
             </div>
             
-            <div class="form-actions" style="margin-top: 20px;">
+            <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Simpan Data</button>
             </div>
         </form>
@@ -158,7 +143,8 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     <th>Nama Lengkap</th>
                     <th>Status</th>
                     <th>Posisi</th>
-                    <th>No. Telp</th> <th>Bio</th>
+                    <th>No. Telp</th> 
+                    <th>Bio</th>
                     <th class="table-aksi-col">Aksi</th>
                 </tr>
             </thead>
@@ -188,9 +174,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     </td>
 
                     <td><?= htmlspecialchars($n['posisi']) ?></td>
-
                     <td><?= htmlspecialchars($n['nomor_telepon'] ?? '-') ?></td>
-
                     <td style="font-size: 0.9rem; color: #666;">
                         <?php
                         $excerpt = strip_tags($n['bio']);
@@ -224,7 +208,6 @@ include_once __DIR__ . '/../includes/sidebar.php';
 </div>
 
 <script>
-    // Ambil Elemen
     const formContainer = document.getElementById('memberFormContainer');
     const btnShow = document.getElementById('btnShowForm');
     const btnCancel = document.getElementById('btnCancelForm');
@@ -235,7 +218,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
     const inputId = document.getElementById('member_id');
     const inputNama = document.getElementById('nama_lengkap');
     const inputPosisi = document.getElementById('posisi');
-    const inputNoTelp = document.getElementById('nomor_telepon'); // TAMBAHAN
+    const inputNoTelp = document.getElementById('nomor_telepon');
     const inputStatus = document.getElementById('status');
     const inputBio = document.getElementById('bio');
     const inputExistingFoto = document.getElementById('existing_foto_profil');
@@ -245,13 +228,11 @@ include_once __DIR__ . '/../includes/sidebar.php';
     const previewContainer = document.getElementById('image_preview_container');
     const previewImg = document.getElementById('image_preview');
 
-    // --- FUNGSI 1: TAMPILKAN FORM TAMBAH ---
     btnShow.addEventListener('click', () => {
         form.reset(); 
         inputId.value = '';
         inputExistingFoto.value = '';
-        inputNoTelp.value = ''; // Reset no telp
-        
+        inputNoTelp.value = ''; 
         if(inputStatus) inputStatus.value = 'aktif';
 
         formTitle.innerText = 'Tambah Anggota Baru';
@@ -264,7 +245,6 @@ include_once __DIR__ . '/../includes/sidebar.php';
         formContainer.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // --- FUNGSI 2: SEMBUNYIKAN FORM ---
     btnCancel.addEventListener('click', () => {
         formContainer.style.display = 'none';
         btnShow.style.display = 'inline-block';
@@ -272,14 +252,12 @@ include_once __DIR__ . '/../includes/sidebar.php';
         form.reset();
     });
 
-    // --- FUNGSI 3: ISI FORM UNTUK EDIT (Dipanggil tombol Pensil) ---
-    // TAMBAHAN: Parameter no_telp ditambahkan
     function editMember(id, nama, bio, posisi, no_telp, status, foto) {
         inputId.value = id;
         inputNama.value = nama;
         inputBio.value = bio;
         inputPosisi.value = posisi;
-        inputNoTelp.value = no_telp; // Isi input no telp
+        inputNoTelp.value = no_telp;
         if(inputStatus) inputStatus.value = status;
         inputExistingFoto.value = foto;
 
@@ -299,7 +277,6 @@ include_once __DIR__ . '/../includes/sidebar.php';
         formContainer.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // --- FUNGSI 4: PREVIEW GAMBAR SAAT UPLOAD ---
     inputImage.addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
@@ -308,3 +285,5 @@ include_once __DIR__ . '/../includes/sidebar.php';
         }
     });
 </script>
+
+<?php include_once __DIR__ . '/../includes/table.php'; ?>

@@ -44,7 +44,7 @@ try {
         }
 
     } else {
-        // Data Dummy
+        // Data dummy (jika belum ada data)
         $featured = [
             'gambar'     => 'assets/img/no-news.png', 
             'judul'      => 'Belum Ada Berita Terbaru',
@@ -69,22 +69,19 @@ try {
     <link rel="stylesheet" href="assets/css/style_profil.css">
 
     <style>
-        /* 1. Pastikan Container Parent Relative */
         .featured-news-content, 
         .news-item-content {
-            position: relative; /* Agar badge bisa diposisikan absolute terhadap kotak ini */
-            padding-bottom: 50px; /* Memberi ruang di bawah agar teks tidak menabrak badge */
+            position: relative;
+            padding-bottom: 50px;
         }
 
-        /* 2. Styling Badge Absolute */
         .badge-tipe {
             position: absolute;
-            bottom: 20px; /* Jarak dari bawah */
-            right: 20px;  /* Jarak dari kanan */
-            
+            bottom: 20px;
+            right: 20px; 
             display: inline-block;
             padding: 5px 10px;
-            border-radius: 10px; /* Membuatnya lebih bulat (pill shape) */
+            border-radius: 10px;
             font-size: 0.8rem;
             font-weight: bold;
             text-transform: uppercase;

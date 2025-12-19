@@ -1,14 +1,13 @@
 <?php 
-// 1. Koneksi Database & Header
 require_once 'config/database.php';
-include 'includes/header.php'; // Menggunakan header utama Anda
+include 'includes/header.php';
 
 $has_featured = false;
 $produk_list = [];
 $featured = [];
 
 try {
-    // 2. LOGIKA DATA: Ambil 1 Produk Terbaru sebagai "Featured"
+    // Ambil 1 Produk Terbaru sebagai "Featured"
     $query_featured = $pdo->prepare("SELECT * FROM produk ORDER BY id DESC LIMIT 1");
     $query_featured->execute();
     $row_featured = $query_featured->fetch();
@@ -20,17 +19,14 @@ try {
         $featured = [
             'judul'      => $row_featured['nama_produk'], 
             'tanggal'    => $row_featured['tanggal_dibuat'] ?? date('Y-m-d'), // Fallback jika null
-            // Potong deskripsi biar tidak kepanjangan
             'deskripsi'  => substr(strip_tags($row_featured['deskripsi']), 0, 250) . '...', 
-            // Cek gambar
             'gambar'     => !empty($row_featured['gambar']) 
                             ? 'uploads/produk/' . $row_featured['gambar'] 
                             : 'assets/img/placeholder_product.png', 
-            // Link eksternal (GitHub/Demo) jika ada
             'link'       => $row_featured['link_produk'] ?? '#'
         ];
         
-        // 3. LOGIKA DATA: Ambil Sisanya untuk Grid
+        // Ambil Sisa produk lainnya untuk Grid
         $query_list = $pdo->prepare("SELECT * FROM produk WHERE id != :id_featured ORDER BY id DESC");
         $query_list->execute(['id_featured' => $row_featured['id']]);
         $rows_list = $query_list->fetchAll();
@@ -68,11 +64,9 @@ try {
 <html lang="id">
 <head>
     <style>
-        /* Memastikan gambar produk di card featured mengisi ruang dengan rapi */
         .featured-news-card img {
             object-fit: cover;
         }
-        /* Memastikan gambar di grid seragam */
         .news-item-grid img {
             height: 200px;
             width: 100%;

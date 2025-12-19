@@ -1,8 +1,7 @@
 <?php
-// 1. Koneksi Database
 include "config/database.php";
 
-// 2. Cek ID dari URL
+// Cek ID dari URL
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: berita-pengumuman.php");
     exit;
@@ -11,12 +10,11 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $id = $_GET['id'];
 
 try {
-    // 3. Ambil Data Berita berdasarkan ID
+    //Ambil Data Berita berdasarkan ID
     $stmt = $pdo->prepare("SELECT * FROM berita WHERE id = ?");
     $stmt->execute([$id]);
     $news = $stmt->fetch();
 
-    // Jika berita tidak ditemukan
     if (!$news) {
         die("<div style='text-align:center; padding:50px; font-family:sans-serif;'><h3>Berita tidak ditemukan.</h3><a href='berita-pengumuman.php'>Kembali</a></div>");
     }
@@ -36,13 +34,12 @@ try {
     <link rel="stylesheet" href="assets/css/style_profil.css">
     
     <style>
-        /* Container Detail menyerupai Featured Card tapi vertikal */
         .detail-wrapper {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 40px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Shadow sama dengan featured card */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             text-align: left;
             margin-bottom: 30px;
         }
@@ -80,7 +77,7 @@ try {
         .detail-image {
             width: 100%;
             height: auto;
-            max-height: 500px; /* Batasi tinggi agar tidak memenuhi layar */
+            max-height: 500px; 
             object-fit: cover;
             display: block;
         }
@@ -89,15 +86,13 @@ try {
             font-size: 16px;
             line-height: 1.8;
             color: var(--text-dark);
-            text-align: justify; /* Teks rata kanan-kiri agar rapi */
+            text-align: justify; 
         }
         
-        /* Jarak antar paragraf */
         .detail-content p {
             margin-bottom: 20px; 
         }
-
-        /* Tombol Kembali */
+        
         .btn-back-container {
             margin-top: 40px;
             text-align: left;

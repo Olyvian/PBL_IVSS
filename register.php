@@ -15,20 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $confirm_password) {
         $message = "❌ Konfirmasi password tidak cocok!";
     } else {
-        
-        // Gunakan variabel $pdo dari database.php
+        // Cek apakah username atau email sudah ada
         $check_stmt = $pdo->prepare("SELECT id FROM users WHERE username = :username OR email = :email");
         $check_stmt->execute(['username' => $username, 'email' => $email]);
         
         if ($check_stmt->rowCount() > 0) {
             $message = "❌ Username atau email sudah digunakan!";
         } else {
+            // Hash password dan insert data
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            
-            // Gunakan variabel $pdo dari database.php
-            $insert_stmt = $pdo->prepare(
-                "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)" 
-            );
+            $insert_stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)");
             
             try {
                 $insert_stmt->execute([
@@ -40,9 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = "✅ Registrasi berhasil! Silakan <a href='login.php'>login</a>.";
             } catch (PDOException $e) {
                 if (strpos($e->getMessage(), 'violates check constraint') !== false) {
-                     $message = "❌ Registrasi gagal. Pastikan nilai 'role' yang diizinkan di database adalah 'User'.";
+                      $message = "❌ Registrasi gagal. Pastikan nilai 'role' yang diizinkan sesuai.";
                 } else {
-                     $message = "❌ Registrasi gagal. Error: " . htmlspecialchars($e->getMessage());
+                      $message = "❌ Registrasi gagal. Error: " . htmlspecialchars($e->getMessage());
                 }
             }
         }
@@ -59,113 +55,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-:root {
-    --polinema-blue-dark: #072a52; 
-    --polinema-orange: #f47f20; 
-    --color-text-light: #ffffff;
-    --color-text-dark: #333333;
-}
+        :root {
+            --polinema-blue-dark: #072a52; 
+            --polinema-orange: #f47f20; 
+            --color-text-light: #ffffff;
+            --color-text-dark: #333333;
+        }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    min-height: 100vh;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    color: var(--color-text-light);
-    
-    background: 
-        linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.85)),
-        /* Menggunakan latar belakang g4.png dari login.php, asumsi file ini tersedia */
-        url('assets/img/g4.png') center center no-repeat fixed; 
-        
-    background-size: cover; 
-    background-color: #555; 
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--color-text-light);
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.85)),
+                url('assets/img/g4.png') center center no-repeat fixed; 
+            background-size: cover; 
+            background-color: #555; 
+        }
 
-.card-login { /* Mengganti .card menjadi .card-login agar sesuai dengan style login */
-    background-color: var(--polinema-blue-dark);
-    color: var(--color-text-light);
-    border-radius: 10px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-    max-width: 450px;
-    width: 100%;
-}
+        .card-login {
+            background-color: var(--polinema-blue-dark);
+            color: var(--color-text-light);
+            border-radius: 10px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 100%;
+        }
 
-.card-login h2 {
-    color: var(--color-text-light);
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 5px;
-}
+        .card-login h2 {
+            color: var(--color-text-light);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
 
-.card-body-custom { /* Menambahkan class custom untuk padding */
-    padding: 30px;
-}
+        .card-body-custom {
+            padding: 30px;
+        }
 
-.greeting-text { /* Menambahkan teks sambutan untuk konsistensi */
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-    text-align: center;
-    opacity: 0.9;
-}
+        .greeting-text {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            text-align: center;
+            opacity: 0.9;
+        }
 
-.form-control {
-    background-color: rgba(255, 255, 255, 0.9);
-    border: none;
-    height: 50px;
-    color: var(--color-text-dark);
-    font-weight: 500;
-}
-.form-control:focus {
-    background-color: var(--color-text-light);
-    border-color: var(--polinema-orange);
-    box-shadow: 0 0 5px rgba(244, 127, 32, 0.8);
-}
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            height: 50px;
+            color: var(--color-text-dark);
+            font-weight: 500;
+        }
+        .form-control:focus {
+            background-color: var(--color-text-light);
+            border-color: var(--polinema-orange);
+            box-shadow: 0 0 5px rgba(244, 127, 32, 0.8);
+        }
 
-.btn-custom {
-    background-color: var(--polinema-orange);
-    border: none;
-    color: white;
-    font-weight: 600;
-    font-size: 1.1rem;
-    padding: 12px 0;
-    box-shadow: 0 4px 15px rgba(244, 127, 32, 0.5);
-    transition: background-color 0.3s ease;
-}
-.btn-custom:hover {
-    background-color: #e0741c; 
-    transform: translateY(-1px);
-}
-.alert-danger, .alert-success { /* Menyesuaikan alert agar sesuai dengan login, hanya menggunakan satu style */
-    background-color: #ffc107;
-    color: var(--color-text-dark);
-    border: none;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
+        .btn-custom {
+            background-color: var(--polinema-orange);
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 12px 0;
+            box-shadow: 0 4px 15px rgba(244, 127, 32, 0.5);
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #e0741c; 
+            transform: translateY(-1px);
+        }
 
-.card-login a, .container a { /* Menyesuaikan warna link */
-    color: #ffc107;
-    text-decoration: underline;
-    font-weight: 500;
-}
-.card-login a:hover, .container a:hover {
-    color: #ffd700;
-}
+        .alert-danger, .alert-success {
+            background-color: #ffc107;
+            color: var(--color-text-dark);
+            border: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
 
-/* Menghilangkan atau menyesuaikan style navbar yang ada di register.php */
-.navbar {
-    display: none; /* Menyembunyikan navbar agar sesuai dengan tampilan login.php */
-}
+        .card-login a, .container a {
+            color: #ffc107;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        .card-login a:hover, .container a:hover {
+            color: #ffd700;
+        }
 
-/* Style tambahan untuk label di register.php agar terlihat di background gelap */
-.form-label {
-    color: var(--color-text-light);
-    font-weight: 500;
-    margin-bottom: 5px;
-}
+        .navbar {
+            display: none;
+        }
 
+        .form-label {
+            color: var(--color-text-light);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -183,10 +174,10 @@ body {
                         
                         <?php if (!empty($message)): ?>
                             <?php 
-                            // Mengubah logika alert agar tetap menggunakan style kuning dari login.php
+                            // Menentukan class alert berdasarkan isi pesan (sukses/gagal)
                             $alertClass = strpos($message, '✅') !== false ? 'alert-success' : 'alert-danger';
                             ?>
-                            <div class="alert alert-danger text-center" role="alert">
+                            <div class="alert <?php echo $alertClass; ?> text-center" role="alert">
                                 <?php echo $message; ?>
                             </div>
                         <?php endif; ?>

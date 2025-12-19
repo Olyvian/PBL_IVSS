@@ -5,7 +5,7 @@ require_once __DIR__ . '/../includes/auth.php';
 $pageTitle = 'Manajemen Dataset';
 $activePage = 'dataset';
 
-// --- 2. LOGIKA SIMPAN (TAMBAH & EDIT) ---
+// logika untuk simpan
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama_dataset = $_POST['nama_dataset'];
     $deskripsi = $_POST['deskripsi'];
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// --- 3. LOGIKA HAPUS ---
+// logika untuk hapus
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $stmt = $pdo->prepare("DELETE FROM dataset WHERE id = ?");
@@ -35,7 +35,7 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// --- 4. AMBIL DATA ---
+// ambil data
 $stmt = $pdo->query("SELECT * FROM dataset ORDER BY tanggal_ditambahkan DESC");
 $list = $stmt->fetchAll();
 
@@ -148,7 +148,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
     const inputDeskripsi = document.getElementById('deskripsi');
     const inputUrl = document.getElementById('url');
 
-    // Tampilkan Form Tambah
+    // form tambah
     btnShow.addEventListener('click', () => {
         inputId.value = '';
         inputNama.value = '';
@@ -169,7 +169,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
         btnCancel.style.display = 'none';
     });
 
-    // Isi Form untuk Edit (Dipanggil tombol pensil)
+    // form edit
     function editDataset(id, nama, deskripsi, url) {
         inputId.value = id;
         inputNama.value = nama;
@@ -184,3 +184,4 @@ include_once __DIR__ . '/../includes/sidebar.php';
         formContainer.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
+<?php include_once __DIR__ . '/../includes/table.php'; ?>
