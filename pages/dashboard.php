@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
 
+require_once __DIR__ . '/../controllers/DashboardController.php';
+
 redirectIfNotLoggedIn(['admin_berita', 'admin_lab']);
 
 $pageTitle = 'Dashboard';
@@ -20,10 +22,8 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-// Role Check
-$isAdminLab = ($_SESSION['role'] ?? '') === 'admin_lab'; 
+$isAdminLab = ($_SESSION['role'] ?? '') === 'admin_lab';
 
-// --- Logic: Visi & Misi (CRUD) ---
 $visi_misi_to_edit = null;
 $show_visimisi_form = false;
 
@@ -31,10 +31,10 @@ if ($isAdminLab) {
     // Handle Save/Update
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['form_visimisi'])) {
         $is_update = isset($_POST['update_visimisi']);
-        $visimisi_id = $is_update ? (int)$_POST['visimisi_id'] : null;
+        $visimisi_id = $is_update ? (int) $_POST['visimisi_id'] : null;
 
         $tipe = trim($_POST['tipe']);
-        $konten_id = (int)$_POST['konten_id'];
+        $konten_id = (int) $_POST['konten_id'];
         $deskripsi = trim($_POST['deskripsi']);
 
         if (!empty($tipe) && !empty($deskripsi)) {
@@ -68,7 +68,7 @@ if ($isAdminLab) {
     if (isset($_GET['action']) && $_GET['action'] === 'delete_visimisi' && isset($_GET['id'])) {
         try {
             $stmt = $pdo->prepare("DELETE FROM visi_misi WHERE id = ?");
-            $stmt->execute([(int)$_GET['id']]);
+            $stmt->execute([(int) $_GET['id']]);
             $_SESSION['success_message'] = "Data Visi & Misi berhasil dihapus.";
         } catch (PDOException $e) {
             $_SESSION['error_message'] = "Gagal menghapus data: " . $e->getMessage();
@@ -81,89 +81,47 @@ if ($isAdminLab) {
     if (isset($_GET['action']) && $_GET['action'] === 'edit_visimisi' && isset($_GET['id'])) {
         try {
             $stmt = $pdo->prepare("SELECT * FROM visi_misi WHERE id = ?");
-            $stmt->execute([(int)$_GET['id']]);
+            $stmt->execute([(int) $_GET['id']]);
             $visi_misi_to_edit = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($visi_misi_to_edit) $show_visimisi_form = true;
+            if ($visi_misi_to_edit)
+                $show_visimisi_form = true;
         } catch (PDOException $e) {
             $error_message = "Error fetching data: " . $e->getMessage();
         }
     }
 }
 
-// --- Fetch Statistics ---
 try {
-    $totalBerita = $pdo->query("SELECT count(id) FROM berita")->fetchColumn();
-    $totalMember = $pdo->query("SELECT count(id) FROM anggota_lab")->fetchColumn(); 
-    $totalRiset = $pdo->query("SELECT count(id) FROM riset")->fetchColumn(); 
-    $totalPendaftaran = $pdo->query("SELECT count(id) FROM pendaftaran_magang WHERE status = 'pending'")->fetchColumn(); 
-    $totalFasilitas = $pdo->query("SELECT count(id) FROM fasilitas_peralatan")->fetchColumn();
+    // 1. Panggil Controller Statistik
+    $dashboardController = new DashboardController($pdo);
+    $stats = $dashboardController->getStats();
 
+    // 2. Fetch Visi Misi (Legacy Query)
     $visiMisiList = $pdo->query("SELECT * FROM visi_misi ORDER BY tipe, konten_id ASC")->fetchAll(PDO::FETCH_ASSOC);
 
-} catch (PDOException $e) {
-    // Fallback values on error
-    $totalBerita = $totalMember = $totalRiset = $totalPendaftaran = $totalFasilitas = 0;
+} catch (Exception $e) {
+    // Fallback values
+    $stats = [
+        'totalBerita' => 0,
+        'totalMember' => 0,
+        'totalRiset' => 0,
+        'totalPendaftaran' => 0,
+        'totalFasilitas' => 0
+    ];
     $visiMisiList = [];
-    $error_message = $error_message ?? "Gagal memuat statistik: " . $e->getMessage();
+    $error_message = $error_message ?? "Gagal memuat data: " . $e->getMessage();
 }
 
 include_once __DIR__ . '/../includes/sidebar.php';
 ?>
 
-<div class="dashboard-grid">
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fa-solid fa-newspaper"></i></div>
-        <div class="stat-info">
-            <span class="stat-title">Total Berita</span>
-            <span class="stat-number"><?php echo $totalBerita; ?></span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="color: #198754; background-color: #e8f3ee;">
-            <i class="fa-solid fa-users"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Total Member</span>
-            <span class="stat-number"><?php echo $totalMember; ?></span>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon" style="color: #ffc107; background-color: #fff8e6;">
-            <i class="fa-solid fa-flask"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Total Riset</span>
-            <span class="stat-number"><?php echo $totalRiset; ?></span>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon" style="color: #6f42c1; background-color: #f1eef8;">
-            <i class="fa-solid fa-file-signature"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Pendaftaran Pending</span>
-            <span class="stat-number"><?php echo $totalPendaftaran; ?></span>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon" style="color: #0dcaf0; background-color: #e0faff;">
-            <i class="fa-solid fa-computer"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-title">Total Fasilitas</span>
-            <span class="stat-number"><?php echo $totalFasilitas; ?></span>
-        </div>
-    </div>
-</div>
+<?php include __DIR__ . '/../views/dashboard_stats.php'; ?>
 
 <div class="card">
     <div class="card-body" style="padding: 2rem;">
         <h4>Selamat Datang, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</h4>
-        <p>Anda login sebagai <?php echo htmlspecialchars($_SESSION['role'] ?? 'Admin'); ?>. Gunakan menu di sebelah kiri untuk mengelola konten website.</p>
+        <p>Anda login sebagai <?php echo htmlspecialchars($_SESSION['role'] ?? 'Admin'); ?>. Gunakan menu di sebelah
+            kiri untuk mengelola konten website.</p>
     </div>
 </div>
 
@@ -189,39 +147,46 @@ include_once __DIR__ . '/../includes/sidebar.php';
     </div>
 
     <?php if ($isAdminLab): ?>
-        <div class="form-container" id="visiMisiFormContainer" style="display: <?php echo $show_visimisi_form ? 'block' : 'none'; ?>;">
+        <div class="form-container" id="visiMisiFormContainer"
+            style="display: <?php echo $show_visimisi_form ? 'block' : 'none'; ?>;">
             <h4 id="visiMisiFormTitle">
                 <?php echo $show_visimisi_form ? 'Ubah Data Visi & Misi' : 'Tambah Visi & Misi Baru'; ?>
             </h4>
-            
+
             <form method="POST" action="dashboard.php">
                 <input type="hidden" name="form_visimisi" value="1">
                 <?php if ($show_visimisi_form): ?>
                     <input type="hidden" name="update_visimisi" value="1">
                     <input type="hidden" name="visimisi_id" value="<?= htmlspecialchars($visi_misi_to_edit['id']) ?>">
                 <?php endif; ?>
-                
+
                 <div class="form-group">
                     <label for="tipe_visimisi">Tipe:</label>
                     <select class="form-control" id="tipe_visimisi" name="tipe" required>
-                        <option value="visi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'visi') echo 'selected'; ?>>Visi</option>
-                        <option value="misi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'misi') echo 'selected'; ?>>Misi</option>
+                        <option value="visi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'visi')
+                            echo 'selected'; ?>>Visi
+                        </option>
+                        <option value="misi" <?php if (($visi_misi_to_edit['tipe'] ?? '') === 'misi')
+                            echo 'selected'; ?>>Misi
+                        </option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="konten_id_visimisi">Urutan:</label>
-                    <input type="number" class="form-control" id="konten_id_visimisi" name="konten_id" min="1" 
+                    <input type="number" class="form-control" id="konten_id_visimisi" name="konten_id" min="1"
                         value="<?= htmlspecialchars($visi_misi_to_edit['konten_id'] ?? 1) ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="deskripsi_visimisi">Deskripsi/Poin:</label>
-                    <textarea class="form-control" id="deskripsi_visimisi" name="deskripsi" rows="3" required><?= htmlspecialchars($visi_misi_to_edit['deskripsi'] ?? '') ?></textarea>
+                    <textarea class="form-control" id="deskripsi_visimisi" name="deskripsi" rows="3"
+                        required><?= htmlspecialchars($visi_misi_to_edit['deskripsi'] ?? '') ?></textarea>
                 </div>
-                
+
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary"><?php echo $show_visimisi_form ? 'Simpan Perubahan' : 'Simpan'; ?></button>
+                    <button type="submit"
+                        class="btn btn-primary"><?php echo $show_visimisi_form ? 'Simpan Perubahan' : 'Simpan'; ?></button>
                     <button type="button" class="btn btn-secondary" id="btnCancelVisiMisi">Batal</button>
                 </div>
             </form>
@@ -256,10 +221,12 @@ include_once __DIR__ . '/../includes/sidebar.php';
                                 <td><?= htmlspecialchars($vm['deskripsi']) ?></td>
                                 <?php if ($isAdminLab): ?>
                                     <td class="table-aksi-col">
-                                        <a href="dashboard.php?action=edit_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-edit" title="Ubah">
+                                        <a href="dashboard.php?action=edit_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-edit"
+                                            title="Ubah">
                                             <i class="fa-solid fa-pencil"></i>
                                         </a>
-                                        <a href="dashboard.php?action=delete_visimisi&id=<?= $vm['id'] ?>" class="btn-icon btn-delete" title="Hapus" 
+                                        <a href="dashboard.php?action=delete_visimisi&id=<?= $vm['id'] ?>"
+                                            class="btn-icon btn-delete" title="Hapus"
                                             onclick="return confirm('Yakin hapus poin ini?')">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </a>
@@ -290,7 +257,7 @@ include_once __DIR__ . '/../includes/sidebar.php';
                     window.location.href = 'dashboard.php';
                     return;
                 }
-                
+
                 if (vmFormContainer.style.display === 'block') {
                     vmFormContainer.style.display = 'none';
                     btnToggleVM.innerText = 'Tambah Visi & Misi';
