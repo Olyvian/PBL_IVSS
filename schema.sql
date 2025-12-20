@@ -1,5 +1,6 @@
 
--- 1. Tabel Users
+-- 1. Tabel Users\
+DROP IF EXISTS TABLE users CASCADE;
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
@@ -21,7 +22,6 @@ CREATE TABLE anggota_lab (
   status VARCHAR(20) NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif', 'alumni')),
   CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
-ALTER TABLE anggota_lab ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif', 'alumni'));
 -- 3. Tabel Berita
 CREATE TABLE berita (
   id SERIAL PRIMARY KEY,
@@ -39,7 +39,7 @@ CREATE TABLE riset (
   id SERIAL PRIMARY KEY,
   judul_riset VARCHAR(255) NOT NULL,
   deskripsi TEXT NOT NULL,
-  link_riset TYPE text,
+  link_riset text,
   tanggal_mulai DATE NULL,
   tanggal_selesai DATE NULL
 );
@@ -96,3 +96,50 @@ CREATE TABLE produk (
     gambar VARCHAR(255) NULL,
     tanggal_dibuat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+DROP PROCEDURE IF EXISTS tambah_anggota_lab(
+    VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR
+);
+
+CREATE OR REPLACE PROCEDURE tambah_anggota_lab(
+    username VARCHAR(50),
+    email VARCHAR(100),
+    password VARCHAR(255),
+    nama_lengkap VARCHAR(100),
+    posisi VARCHAR(50),
+    nomor_telepon VARCHAR(20) DEFAULT NULL
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    user_id INT;
+BEGIN
+
+    INSERT INTO users (username, email, password, role)
+    VALUES (username, email, password, 'member_lab')
+    RETURNING id INTO user_id;
+
+    INSERT INTO anggota_lab (
+        user_id,
+        nama_lengkap,
+        posisi,
+        nomor_telepon,
+        status
+    )
+    VALUES (
+        user_id,
+        nama_lengkap,
+        posisi,
+        nomor_telepon,
+        'aktif'
+    );
+
+
+EXCEPTION
+    WHEN unique_violation THEN
+        RAISE EXCEPTION 'Username atau email sudah terdaftar: %', SQLERRM;
+    WHEN OTHERS THEN
+        RAISE EXCEPTION 'Gagal menambahkan anggota lab: %', SQLERRM;
+END;
+$$;

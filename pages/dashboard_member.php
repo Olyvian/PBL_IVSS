@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nomor_telepon = $_POST['nomor_telepon']; 
     $status        = strtolower($_POST['status']); 
     $foto_profil   = null;
-
+    
     // Handle Upload
     if (!empty($_FILES['foto_profil']['name'])) {
         $filename = uniqid() . '_' . basename($_FILES['foto_profil']['name']);
@@ -39,9 +39,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$nama_lengkap, $bio, $posisi, $nomor_telepon, $status, $foto_profil, $id]);
 
     } else {
-        // Mode: Insert
-        $stmt = $pdo->prepare("INSERT INTO anggota_lab (nama_lengkap, bio, posisi, nomor_telepon, status, foto_profil) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$nama_lengkap, $bio, $posisi, $nomor_telepon, $status, $foto_profil]);
+    
+        $username = trim($_POST['username']);
+        $email = trim($_POST['email']);
+        $password = password_hash('password', PASSWORD_DEFAULT);
+    
+
+        $stmt = $pdo->prepare("CALL tambah_anggota_lab(?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $username,
+            $email,
+            $password,
+            $nama_lengkap,
+            $posisi,
+            $nomor_telepon
+        ]);
+
     }
     
     header('Location: dashboard_member.php'); 
@@ -93,7 +106,15 @@ include_once __DIR__ . '/../includes/sidebar.php';
             
             <div class="form-group">
                 <label for="nama_lengkap">Nama Lengkap:</label>
-                <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" required>
+                <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" required placeholder="Nama Lengkap" >
+            </div>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" name="username" id="username" class="form-control" required placeholder="Usernmae">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="text" name="email" id="email" class="form-control" required placeholder="Email">
             </div>
             
             <div class="form-group">
